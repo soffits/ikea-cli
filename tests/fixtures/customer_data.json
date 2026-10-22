@@ -1,0 +1,19 @@
+{
+ "customers": [
+  {
+   "firstName": "Test",
+   "preferredBUCode": "101",
+   "loyaltyMemberships": [
+    {
+     "programCode": "FAMILYCA",
+     "status": "ACTIVE",
+     "created": "2025-01-01T00:00:00Z"
+    }
+   ],
+   "activeLoyaltyMembershipCard": {
+    "cardNumber": "0000000000001234",
+    "cardStatus": "ACTIVE"
+   }
+  }
+ ]
+}

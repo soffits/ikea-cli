@@ -1,0 +1,54 @@
+[
+ {
+  "id": "101",
+  "name": "IKEA Testville",
+  "displayName": "IKEA Testville",
+  "lat": "45.0",
+  "lng": "-75.0",
+  "address": {
+   "city": "Testville",
+   "stateProvinceCode": "CAON",
+   "displayAddress": "1 Example Road",
+   "zipCode": "A1A 1A1",
+   "timezone": "America/Toronto"
+  },
+  "hours": {
+   "normal": [
+    {
+     "day": "MON",
+     "open": "10:00",
+     "close": "21:00"
+    }
+   ]
+  },
+  "buClassification": {
+   "code": "STORE",
+   "name": "IKEA STORE"
+  },
+  "storePageUrl": "https://www.ikea.com/ca/en/stores/testville/"
+ },
+ {
+  "id": "202",
+  "name": "IKEA Sampleton",
+  "displayName": "IKEA Sampleton",
+  "lat": "49.0",
+  "lng": "-123.0",
+  "address": {
+   "city": "Sampleton",
+   "stateProvinceCode": "CABC"
+  },
+  "hours": {
+   "normal": []
+  },
+  "buClassification": {
+   "code": "STORE",
+   "name": "IKEA STORE"
+  }
+ },
+ {
+  "id": "303",
+  "name": "Hidden",
+  "hideStore": true,
+  "address": {}
+ }
+]

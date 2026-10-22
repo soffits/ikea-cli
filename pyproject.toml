@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ikea-cli"
+dynamic = ["version"]
+description = "Unofficial command-line client and Python library for the IKEA website: search, stock, cart, favourites, orders"
+readme = "README.md"
+license = "AGPL-3.0-only"
+authors = [{ name = "Sakina" }]
+maintainers = [{ name = "Sakina" }]
+requires-python = ">=3.11"
+dependencies = ["httpx>=0.27,<1", "platformdirs>=4.2"]
+keywords = ["ikea", "cli", "shopping", "cart", "stock", "agent"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/soffits/ikea-cli"
+Repository = "https://github.com/soffits/ikea-cli"
+Issues = "https://github.com/soffits/ikea-cli/issues"
+Security = "https://github.com/soffits/ikea-cli/security"
+
+
+[project.scripts]
+ikea = "ikea_cli.cli:main"
+
+[dependency-groups]
+dev = ["build>=1.2", "pytest>=8.3", "ruff>=0.8"]
+
+[tool.hatch.version]
+path = "src/ikea_cli/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/skills",
+    "/scripts",
+    "/README.md",
+    "/LICENSE",
+    "/SECURITY.md",
+    "/CONTRIBUTING.md",
+    "/CHANGELOG.md",
+    "/pyproject.toml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ikea_cli"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"skills/ikea/SKILL.md" = "ikea_cli/SKILL.md"
+"LICENSE" = "ikea_cli/LICENSE"
+
+[tool.pytest.ini_options]
+addopts = "-q -m 'not live'"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = ["live: talks to the real IKEA website; opt in with IKEA_LIVE=1 and -m live"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003", "SIM108"]

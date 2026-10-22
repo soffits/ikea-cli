@@ -1,0 +1,61 @@
+{
+ "data": {
+  "historyData": {
+   "totalPurchases": 2,
+   "historicalPurchases": [
+    {
+     "id": "111111111",
+     "status": "COMPLETED",
+     "eventStatus": null,
+     "type": "ORDER",
+     "storeName": "IKEA Testville",
+     "dateAndTime": {
+      "date": "2026-01-15",
+      "time": "12:30:00Z",
+      "timeZone": "Etc/UTC",
+      "formattedShortDate": "2026-01-15",
+      "formattedLongDateTime": "January 15"
+     },
+     "totalCost": {
+      "code": "CAD",
+      "value": 59.98,
+      "formatted": "$59.98"
+     },
+     "articles": {
+      "quantity": 2,
+      "any": [
+       {
+        "id": "12345678",
+        "name": "TESTBORD",
+        "quantity": 2
+       }
+      ]
+     }
+    },
+    {
+     "id": "222222222",
+     "status": "COMPLETED",
+     "eventStatus": null,
+     "type": "RECEIPT",
+     "storeName": "IKEA Sampleton",
+     "dateAndTime": {
+      "date": "2026-01-15",
+      "time": "12:30:00Z",
+      "timeZone": "Etc/UTC",
+      "formattedShortDate": "2026-01-15",
+      "formattedLongDateTime": "January 15"
+     },
+     "totalCost": {
+      "code": "CAD",
+      "value": 9.99,
+      "formatted": "$9.99"
+     },
+     "articles": {
+      "quantity": 1,
+      "any": []
+     }
+    }
+   ]
+  }
+ }
+}

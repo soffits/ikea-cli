@@ -1,0 +1,54 @@
+{
+ "cart": {
+  "isEligibleForParcelDelivery": true,
+  "isEligibleForTruckDelivery": false
+ },
+ "items": [
+  {
+   "itemNo": "12345678",
+   "homeDelivery": {
+    "available": true,
+    "reasonCode": null
+   },
+   "clickAndCollect": {
+    "available": true
+   },
+   "cashAndCarry": {
+    "available": false,
+    "availableQty": 0,
+    "availabilityLevel": null,
+    "reasonCode": "OUT_OF_STOCK",
+    "salesLocations": [
+     {
+      "department": "Tables",
+      "division": "MARKET_HALL"
+     }
+    ]
+   },
+   "restock": {
+    "cashAndCarry": {
+     "earliestDate": "2026-02-01",
+     "latestDate": "2026-02-03"
+    }
+   }
+  }
+ ],
+ "deliveryPrices": {
+  "homeDelivery": {
+   "current": 19.99,
+   "original": 29.99
+  },
+  "clickCollect": {
+   "current": 5,
+   "original": 5
+  }
+ },
+ "deliveryDates": {
+  "homeDelivery": {
+   "indicativeLeadTime": "3 - 5"
+  },
+  "clickCollect": {
+   "indicativeLeadTime": "1 - 2"
+  }
+ }
+}

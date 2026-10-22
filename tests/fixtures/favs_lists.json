@@ -1,0 +1,44 @@
+{
+ "data": {
+  "lists": [
+   {
+    "listId": "list-a",
+    "name": "Living room",
+    "isSelected": true,
+    "updated": "2026-01-01T00:00:00Z",
+    "quantity": 2,
+    "items": [
+     {
+      "itemNo": "12345678",
+      "quantity": 2,
+      "type": "ART",
+      "isBuyableOnline": true,
+      "addedAt": 1700000000,
+      "product": {
+       "name": "TESTBORD",
+       "description": "white"
+      },
+      "prices": {
+       "online": {
+        "regular": {
+         "unit": {
+          "inclTax": null,
+          "exclTax": 9.99
+         }
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "listId": "list-b",
+    "name": "Kitchen",
+    "isSelected": false,
+    "updated": "2026-01-01T00:00:00Z",
+    "quantity": 0,
+    "items": []
+   }
+  ]
+ }
+}

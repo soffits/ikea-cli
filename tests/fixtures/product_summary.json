@@ -1,0 +1,20 @@
+{
+ "id": "12345678",
+ "name": "TESTBORD",
+ "typeName": "Side table",
+ "validDesignText": "white",
+ "priceNumeral": 29.99,
+ "priceExclTaxNumeral": 29.99,
+ "currencyCode": "CAD",
+ "pipUrl": "https://www.ikea.com/ca/en/p/testbord-side-table-white-12345678/",
+ "mainImage": {
+  "url": "https://www.ikea.com/images/example.jpg"
+ },
+ "experimental": {
+  "rating": {
+   "value": 4.5,
+   "count": 10
+  },
+  "isNewProduct": true
+ }
+}

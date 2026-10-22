@@ -1,0 +1,22 @@
+[
+ {
+  "offerCode": "OFFER-2",
+  "amount": 100,
+  "category": "DISCOUNT",
+  "status": "ACTIVE",
+  "content": {
+   "name": "$10 off",
+   "description": "<p>Get <b>$10</b> off.</p>"
+  }
+ },
+ {
+  "offerCode": "OFFER-1",
+  "amount": 50,
+  "category": "DISCOUNT",
+  "status": "ACTIVE",
+  "content": {
+   "name": "$5 off",
+   "description": "<p>Get $5 off.</p>"
+  }
+ }
+]

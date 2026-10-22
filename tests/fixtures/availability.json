@@ -1,0 +1,157 @@
+{
+ "availabilities": [
+  {
+   "availableForHomeDelivery": true,
+   "availableForClickCollect": true,
+   "buyingOption": {
+    "homeDelivery": {
+     "availability": {
+      "probability": {
+       "thisDay": {
+        "messageType": "HIGH_IN_STOCK"
+       }
+      }
+     }
+    }
+   },
+   "classUnitKey": {
+    "classUnitCode": "CA",
+    "classUnitType": "RU"
+   },
+   "itemKey": {
+    "itemNo": "12345678",
+    "itemType": "ART"
+   }
+  },
+  {
+   "availableForCashCarry": true,
+   "availableForClickCollect": true,
+   "buyingOption": {
+    "cashCarry": {
+     "availability": {
+      "probability": {
+       "thisDay": {
+        "messageType": "HIGH_IN_STOCK"
+       }
+      },
+      "quantity": 12,
+      "updateDateTime": "2026-01-01T10:00:00Z"
+     },
+     "range": {
+      "inRange": true
+     }
+    }
+   },
+   "classUnitKey": {
+    "classUnitCode": "101",
+    "classUnitType": "STO"
+   },
+   "itemKey": {
+    "itemNo": "12345678",
+    "itemType": "ART"
+   }
+  },
+  {
+   "availableForCashCarry": false,
+   "availableForClickCollect": true,
+   "buyingOption": {
+    "cashCarry": {
+     "availability": {
+      "probability": {
+       "thisDay": {
+        "messageType": "OUT_OF_STOCK"
+       }
+      },
+      "quantity": 0,
+      "updateDateTime": "2026-01-01T10:00:00Z",
+      "restocks": [
+       {
+        "earliestDate": "2026-02-01",
+        "latestDate": "2026-02-03",
+        "quantity": 20,
+        "reliability": "HIGH"
+       }
+      ]
+     },
+     "range": {
+      "inRange": true
+     }
+    }
+   },
+   "classUnitKey": {
+    "classUnitCode": "202",
+    "classUnitType": "STO"
+   },
+   "itemKey": {
+    "itemNo": "12345678",
+    "itemType": "ART"
+   }
+  },
+  {
+   "availableForClickCollect": true,
+   "buyingOption": {
+    "cashCarry": {
+     "range": {
+      "inRange": false
+     }
+    }
+   },
+   "classUnitKey": {
+    "classUnitCode": "9999",
+    "classUnitType": "STO"
+   },
+   "itemKey": {
+    "itemNo": "12345678",
+    "itemType": "ART"
+   }
+  }
+ ],
+ "salesLocations": [
+  {
+   "classUnitKey": {
+    "classUnitCode": "101",
+    "classUnitType": "STO"
+   },
+   "itemKey": {
+    "itemNo": "12345678"
+   },
+   "salesLocations": [
+    {
+     "aisleAndBin": {
+      "aisle": "7",
+      "bin": "12"
+     },
+     "division": "SELF_SERVE",
+     "type": "AISLE_AND_BIN"
+    }
+   ]
+  },
+  {
+   "classUnitKey": {
+    "classUnitCode": "202",
+    "classUnitType": "STO"
+   },
+   "itemKey": {
+    "itemNo": "12345678"
+   },
+   "salesLocations": [
+    {
+     "department": {
+      "names": [
+       {
+        "languageCode": "fr",
+        "name": "Tables (fr)"
+       },
+       {
+        "languageCode": "en",
+        "name": "Tables"
+       }
+      ]
+     },
+     "division": "MARKET_HALL",
+     "type": "DEPARTMENT"
+    }
+   ]
+  }
+ ]
+}

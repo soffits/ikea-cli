@@ -1,0 +1,152 @@
+{
+ "results": [
+  {
+   "component": "SEARCH_SUMMARY",
+   "originalQuery": "table",
+   "didYouMeanPhrases": [],
+   "queryWasExpanded": false
+  },
+  {
+   "component": "PRIMARY_AREA",
+   "metadata": {
+    "start": 0,
+    "end": 2,
+    "max": 42
+   },
+   "items": [
+    {
+     "type": "PRODUCT",
+     "product": {
+      "itemNo": "12345678",
+      "id": "12345678",
+      "itemType": "ART",
+      "name": "TESTBORD",
+      "typeName": "Side table",
+      "validDesignText": "white",
+      "itemMeasureReferenceText": "80x40 cm",
+      "salesPrice": {
+       "currencyCode": "CAD",
+       "numeral": 29.99
+      },
+      "ratingValue": 4.5,
+      "ratingCount": 10,
+      "onlineSellable": true,
+      "gprDescription": {
+       "numberOfVariants": 2
+      },
+      "categoryPath": [
+       {
+        "key": "10000",
+        "name": "Tables"
+       },
+       {
+        "key": "10001",
+        "name": "Side tables"
+       }
+      ],
+      "pipUrl": "https://www.ikea.com/ca/en/p/testbord-12345678/",
+      "mainImageUrl": "https://www.ikea.com/images/example.jpg"
+     }
+    },
+    {
+     "type": "CONTENT",
+     "content": {}
+    },
+    {
+     "type": "PRODUCT",
+     "product": {
+      "itemNo": "87654321",
+      "id": "87654321",
+      "itemType": "SPR",
+      "name": "PROVSTOL",
+      "typeName": "Chair",
+      "validDesignText": "white",
+      "itemMeasureReferenceText": "80x40 cm",
+      "salesPrice": {
+       "currencyCode": "CAD",
+       "numeral": 49.0
+      },
+      "ratingValue": 4.5,
+      "ratingCount": 10,
+      "onlineSellable": true,
+      "gprDescription": {
+       "numberOfVariants": 2
+      },
+      "categoryPath": [
+       {
+        "key": "10000",
+        "name": "Tables"
+       },
+       {
+        "key": "10001",
+        "name": "Side tables"
+       }
+      ],
+      "pipUrl": "https://www.ikea.com/ca/en/p/provstol-87654321/",
+      "mainImageUrl": "https://www.ikea.com/images/example.jpg"
+     }
+    }
+   ],
+   "filters": [
+    {
+     "type": "CLASS_FILTER",
+     "parameter": "f-colors",
+     "name": "Colour",
+     "values": [
+      {
+       "id": "10156",
+       "name": "white",
+       "count": 30,
+       "selected": false
+      },
+      {
+       "id": "10139",
+       "name": "black",
+       "count": 12,
+       "selected": true
+      }
+     ]
+    },
+    {
+     "type": "TYPED_CLASS_FILTER",
+     "parameter": "f-measurement-buckets",
+     "name": "Size",
+     "types": [
+      {
+       "name": "Width",
+       "values": [
+        {
+         "id": "W_0_50",
+         "name": "0 - 49 cm",
+         "count": 5,
+         "selected": false
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "BOOLEAN",
+     "parameter": "f-new-product",
+     "name": "New products",
+     "selected": false
+    }
+   ],
+   "sortOrders": {
+    "name": "Sort",
+    "values": [
+     {
+      "id": "RELEVANCE",
+      "name": "Best match",
+      "selected": false
+     },
+     {
+      "id": "PRICE_LOW_TO_HIGH",
+      "name": "Price: low to high",
+      "selected": true
+     }
+    ]
+   }
+  }
+ ]
+}

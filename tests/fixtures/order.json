@@ -1,0 +1,89 @@
+{
+ "data": {
+  "order": {
+   "id": "111111111",
+   "status": "IN_PROGRESS",
+   "storeName": "IKEA Testville",
+   "dateAndTime": {
+    "date": "2026-01-15",
+    "time": "12:30:00Z",
+    "timeZone": "Etc/UTC",
+    "formattedShortDate": "2026-01-15",
+    "formattedLongDateTime": "January 15"
+   },
+   "costs": {
+    "total": {
+     "value": 67.77,
+     "formatted": "$67.77",
+     "code": "CAD"
+    },
+    "sub": {
+     "value": 59.98,
+     "formatted": "$59.98",
+     "code": "CAD"
+    },
+    "delivery": {
+     "value": 0.0,
+     "formatted": "$0.00",
+     "code": "CAD"
+    },
+    "tax": {
+     "value": 7.79,
+     "formatted": "$7.79",
+     "code": "CAD"
+    },
+    "service": null,
+    "discount": null
+   },
+   "articles": {
+    "quantity": 2,
+    "any": [
+     {
+      "id": "12345678",
+      "name": "TESTBORD",
+      "description": "Side table",
+      "quantity": 2,
+      "href": "https://www.ikea.com/ca/en/p/x-12345678/",
+      "unitPrice": {
+       "formatted": "$29.99"
+      },
+      "totalPrice": {
+       "formatted": "$59.98"
+      }
+     }
+    ]
+   },
+   "deliveryMethods": [
+    {
+     "type": "PARCEL",
+     "statusV2": [
+      {
+       "deliveryStatusV2": "ORDER_PLACED",
+       "tense": "PAST"
+      },
+      {
+       "deliveryStatusV2": "IN_TRANSIT",
+       "tense": "PRESENT"
+      },
+      {
+       "deliveryStatusV2": "DELIVERED",
+       "tense": "FUTURE"
+      }
+     ],
+     "deliveryDate": {
+      "actual": null,
+      "estimatedFrom": {
+       "date": "2026-01-20",
+       "time": "08:00:00Z"
+      },
+      "estimatedTo": {
+       "date": "2026-01-20",
+       "time": "17:00:00Z"
+      },
+      "dateTimeRange": null
+     }
+    }
+   ]
+  }
+ }
+}

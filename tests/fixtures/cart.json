@@ -1,0 +1,94 @@
+{
+ "empty": false,
+ "cartId": "00000000-0000-0000-0000-000000000000",
+ "customer": {
+  "type": "PRIVATE",
+  "familyLoyalty": false
+ },
+ "groups": [
+  {
+   "name": "DEFAULT",
+   "items": [
+    {
+     "itemNo": "12345678",
+     "quantity": 2.0,
+     "itemType": "ART",
+     "childItems": [],
+     "info": {
+      "name": "TESTBORD",
+      "category": "side table",
+      "description": "white",
+      "measurements": [
+       {
+        "metric": "55x55 cm"
+       }
+      ],
+      "numberOfPackages": 1
+     },
+     "price": {
+      "unitPrice": {
+       "current": {
+        "inclTax": null,
+        "exclTax": 29.99
+       },
+       "isFamilyItem": false
+      },
+      "subtotal": {
+       "current": {
+        "inclTax": null,
+        "exclTax": 59.98
+       }
+      }
+     }
+    },
+    {
+     "itemNo": "87654321",
+     "quantity": 1.0,
+     "itemType": "ART",
+     "childItems": [],
+     "info": {
+      "name": "PROVSTOL",
+      "category": "side table",
+      "description": "white",
+      "measurements": [
+       {
+        "metric": "55x55 cm"
+       }
+      ],
+      "numberOfPackages": 1
+     },
+     "price": {
+      "unitPrice": {
+       "current": {
+        "inclTax": null,
+        "exclTax": 49.0
+       },
+       "isFamilyItem": false
+      },
+      "subtotal": {
+       "current": {
+        "inclTax": null,
+        "exclTax": 49.0
+       }
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "discountCodes": [
+  {
+   "code": "SAVE10"
+  }
+ ],
+ "price": {
+  "totalPrice": {
+   "current": {
+    "inclTax": null,
+    "exclTax": 108.98
+   }
+  },
+  "currency": "CAD"
+ },
+ "quantity": 3.0
+}

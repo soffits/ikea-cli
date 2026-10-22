@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: macos-latest
+            python-version: "3.13"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Ruff
+        run: uv run ruff check .
+      - name: Ruff format
+        run: uv run ruff format --check .
+      - name: Pytest (offline)
+        run: uv run pytest
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.13"
+      - name: Build artifacts
+        run: uv build
+      - name: Verify artifacts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import tarfile
+          import zipfile
+
+          wheels = list(Path("dist").glob("ikea_cli-*.whl"))
+          sdists = list(Path("dist").glob("ikea_cli-*.tar.gz"))
+          if len(wheels) != 1 or len(sdists) != 1:
+              raise SystemExit("expected exactly one wheel and one sdist")
+          with zipfile.ZipFile(wheels[0]) as wheel:
+              names = set(wheel.namelist())
+              for required in ("ikea_cli/SKILL.md", "ikea_cli/LICENSE", "ikea_cli/cli.py"):
+                  if required not in names:
+                      raise SystemExit(f"wheel is missing {required}")
+              entry_points = next(n for n in names if n.endswith(".dist-info/entry_points.txt"))
+              if "ikea = ikea_cli.cli:main" not in wheel.read(entry_points).decode():
+                  raise SystemExit("wheel is missing the ikea entry point")
+          with tarfile.open(sdists[0]) as sdist:
+              root = sdists[0].name.removesuffix(".tar.gz")
+              names = set(sdist.getnames())
+              for required in (f"{root}/LICENSE", f"{root}/skills/ikea/SKILL.md", f"{root}/tests/conftest.py"):
+                  if required not in names:
+                      raise SystemExit(f"sdist is missing {required}")
+          PY
+      - name: Smoke test the wheel
+        run: |
+          uv venv /tmp/wheel-env
+          uv pip install --python /tmp/wheel-env dist/*.whl
+          /tmp/wheel-env/bin/ikea --version
+          /tmp/wheel-env/bin/ikea --help > /dev/null
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ikea-cli-dist
+          path: dist/*
