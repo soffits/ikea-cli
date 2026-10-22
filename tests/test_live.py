@@ -133,7 +133,7 @@ def test_login_link(guest):
     url = auth.authorize_url(guest.settings, challenge, secrets.token_urlsafe(8), mode="redirect")
     resp = httpx.get(url, follow_redirects=True, timeout=30, headers={"user-agent": "Mozilla/5.0"})
     assert resp.status_code == 200
-    assert "callback url mismatch" not in resp.text.lower() and "invalid_request" not in str(resp.url)
+    assert "error" not in resp.url.path and "error=" not in str(resp.url), "IKEA's login service rejected the link"
 
 
 @pytest.mark.skipif(not ACCOUNT_TOKEN, reason="set IKEA_LIVE_ACCOUNT=1 and IKEA_ACCESS_TOKEN for read-only account checks")

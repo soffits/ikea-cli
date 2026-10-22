@@ -9,7 +9,7 @@ from conftest import load_fixture
 from ikea_cli import cli, markets, normalize
 from ikea_cli.client import IkeaClient
 from ikea_cli.config import Paths, Settings, load_settings, save_config, write_private_json
-from ikea_cli.errors import EXIT_CONFIG, ConfigError, MarketNotSet, UnsupportedMarket
+from ikea_cli.errors import EXIT_CONFIG, ConfigError, MarketNotSet, NotAvailable, UnsupportedMarket
 from ikea_cli.markets import PriceFormat
 
 TABLE = {
@@ -194,7 +194,7 @@ def test_delivery_without_postal_lookup(router, make_client):
     router.add("POST", "https://web-api.ikea.com/cart-bff-cf/api/v2/fulfilment", load_fixture("fulfilment.json"))
     result = make_client().delivery([("12345678", 1)], postal_code="99999")
     body = json.loads(router.last("POST", "/fulfilment").content)
-    assert body["address"]["postalCode"] == "99999" and body["address"]["stateCode"] is None
+    assert body["address"]["postalCode"] == "99999" and body["address"]["stateCode"] == ""
     assert result["province"] is None
 
 
@@ -270,3 +270,22 @@ def test_earlier_setup_is_written_down_once(run, router, monkeypatch):
 def test_unsupported_market_from_flag(run):
     code, _, err = run("--country", "cn", "search", "desk")
     assert code == EXIT_CONFIG and "runs its own website" in err
+
+
+def test_delivery_not_offered_in_market(router, make_client):
+    router.add("POST", "https://api.ingka.ikea.com/address/location", {"postCode": "99999", "matches": []}, status=200)
+    router.add("POST", "https://api.ingka.ikea.com/guest/token", {"access_token": "guest", "expires_in": "720h"})
+    router.add(
+        "POST",
+        "https://web-api.ikea.com/cart-bff-cf/api/v2/fulfilment",
+        {"success": False, "error": {"issues": [{"code": "invalid_enum_value", "path": ["address", "country"]}]}},
+        status=400,
+    )
+    router.add(
+        "POST",
+        "https://api.ingka.ikea.com/address/location",
+        {"errorCode": "BAD_REQUEST", "errorMessage": "This country code is not supported for location lookup"},
+        status=400,
+    )
+    with pytest.raises(NotAvailable, match="delivery check is not available"):
+        make_client().delivery([("12345678", 1)], postal_code="99999")

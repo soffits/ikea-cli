@@ -13,6 +13,7 @@ Sources, all public and the same ones the IKEA website loads in a browser:
 - https://www.ikea.com/{cc}/: redirects to the market's default language.
 - https://www.ikea.com/{cc}/{lang}/profile/login/ and the profile app it loads: the market's
   public login settings (Auth0 domain and client id).
+- The interactive login link for our settings: kept only if Auth0 shows its login page.
 - One product search per market and language: the currency and how IKEA writes prices there.
 
 pycountry (LGPL-2.1) is only used here, for English country names; the package does not need it.
@@ -112,7 +113,30 @@ def auth_settings(cc: str, lang: str) -> dict[str, str] | None:
     if not found:
         log(f"  {cc}/{lang}: no AUTH0 settings in the profile app")
         return None
-    return {"domain": found.group(1), "client_id": found.group(2)}
+    settings = {"domain": found.group(1), "client_id": found.group(2)}
+    if not login_link_accepted(cc, lang, settings):
+        log(f"  {cc}/{lang}: {settings['domain']} does not accept our login link; login left out")
+        return None
+    return settings
+
+
+def login_link_accepted(cc: str, lang: str, settings: dict[str, str]) -> bool:
+    """Open the interactive login link (no sign-in happens) and check Auth0 shows its login page, not an error."""
+
+    params = {
+        "client_id": settings["client_id"],
+        "redirect_uri": f"https://www.ikea.com/{cc}/{lang}/profile/login/",
+        "scope": "openid profile email offline_access",
+        "audience": "https://retail.api.ikea.com",
+        "response_type": "code",
+        "response_mode": "fragment",
+        "code_challenge_method": "S256",
+        "code_challenge": "x" * 43,
+        "state": "check",
+    }
+    resp = http.get(f"https://{settings['domain']}/authorize", params=params, follow_redirects=True)
+    time.sleep(PAUSE)
+    return resp.status_code == 200 and "error" not in resp.url.path and "error=" not in str(resp.url)
 
 
 def _search(cc: str, lang: str, sort: str, text: str) -> list[dict[str, Any]]:

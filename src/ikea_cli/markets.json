@@ -162,10 +162,7 @@
      "decimal": "."
     }
    },
-   "auth": {
-    "domain": "au.accounts.ikea.com",
-    "client_id": "HXUSz2Yppi5snAqTk9ikVOP5s7WdabJR"
-   }
+   "auth": null
   },
   "ca": {
    "name": "Canada",
@@ -1366,10 +1363,7 @@
      "decimal": "."
     }
    },
-   "auth": {
-    "domain": "au.accounts.ikea.com",
-    "client_id": "HXUSz2Yppi5snAqTk9ikVOP5s7WdabJR"
-   }
+   "auth": null
   },
   "se": {
    "name": "Sweden",

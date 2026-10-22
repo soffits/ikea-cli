@@ -35,7 +35,7 @@ from .config import (
     read_private_json,
     write_private_json,
 )
-from .errors import ApiError, IkeaError, NotFound, SessionExpired, UsageError
+from .errors import ApiError, IkeaError, NotAvailable, NotFound, SessionExpired, UsageError
 from .transport import Transport, new_request_id
 
 SEARCH_VERSION = "20260727"
@@ -434,14 +434,32 @@ class IkeaClient:
         if not lines:
             raise UsageError("Nothing to check: give item numbers or use the cart.")
         loc = self.postal_lookup(postal_code)
-        data, _ = self._authed(
+        try:
+            data, _ = self._fulfilment(loc, lines, store)
+        except ApiError as exc:
+            if exc.status == 400 and "invalid_enum_value" in exc.message and '"country"' in exc.message:
+                raise NotAvailable(
+                    f"IKEA's delivery check is not available for IKEA {self.market.name}.",
+                    status=400,
+                    hint="Stock per store still works: `ikea stock ITEM`. See delivery options on ikea.com.",
+                ) from exc
+            raise
+        out = normalize.fulfilment(data or {})
+        out["postal_code"] = loc["postal_code"]
+        out["province"] = loc["province"]
+        out["city"] = loc["city"]
+        out["store_id"] = store
+        return out
+
+    def _fulfilment(self, loc: dict[str, Any], lines: list[dict[str, Any]], store: str | None) -> tuple[Any, bool]:
+        return self._authed(
             "POST",
             "https://web-api.ikea.com/cart-bff-cf/api/v2/fulfilment",
             shopper=True,
             json_body={
                 "address": {
                     "postalCode": loc["postal_code"],
-                    "stateCode": loc["province"],
+                    "stateCode": loc["province"] or "",
                     "storeId": store or "",
                     "country": self.cc,
                     "language": self.lang,
@@ -459,12 +477,6 @@ class IkeaClient:
             },
             what="IKEA delivery",
         )
-        out = normalize.fulfilment(data or {})
-        out["postal_code"] = loc["postal_code"]
-        out["province"] = loc["province"]
-        out["city"] = loc["city"]
-        out["store_id"] = store
-        return out
 
     # ======================================================================= cart
 
