@@ -258,10 +258,13 @@ def test_stock_uses_default_store(run, router):
 
 
 def test_unverified_market_note(run, router):
-    router.add("POST", "https://sik.search.blue.cdtapps.com/se/sv/search", load_fixture("search.json"))
-    code, _, err = run("--country", "se", "--language", "sv", "search", "bord")
+    router.add("POST", "https://sik.search.blue.cdtapps.com/it/it/search", load_fixture("search.json"))
+    code, _, err = run("--country", "it", "search", "bord")
     assert code == 0
     assert "has not been tested" in err
+    router.add("POST", "https://sik.search.blue.cdtapps.com/se/sv/search", load_fixture("search.json"))
+    _, _, err = run("--country", "se", "search", "bord")
+    assert "has not been tested" not in err
 
 
 @pytest.mark.parametrize(
