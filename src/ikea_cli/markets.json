@@ -213,7 +213,7 @@
     "fr": "Français",
     "it": "Italiano"
    },
-   "default_language": "en",
+   "default_language": "de",
    "currency": "CHF",
    "price_format": {
     "de": {
@@ -467,7 +467,7 @@
     "eu": "eu",
     "gl": "gl"
    },
-   "default_language": "en",
+   "default_language": "es",
    "currency": "EUR",
    "price_format": {
     "ca": {
@@ -791,7 +791,7 @@
     "en": "English",
     "ja": "日本語"
    },
-   "default_language": "en",
+   "default_language": "ja",
    "currency": "JPY",
    "price_format": {
     "en": {
@@ -824,7 +824,7 @@
     "en": "English",
     "ko": "한국어"
    },
-   "default_language": "en",
+   "default_language": "ko",
    "currency": "KRW",
    "price_format": {
     "en": {
@@ -1008,7 +1008,7 @@
     "en": "English",
     "es": "Español"
    },
-   "default_language": "en",
+   "default_language": "es",
    "currency": "MXN",
    "price_format": {
     "en": {
@@ -1069,7 +1069,7 @@
     "en": "English",
     "nl": "Nederlands"
    },
-   "default_language": "en",
+   "default_language": "nl",
    "currency": "EUR",
    "price_format": {
     "en": {
@@ -1234,7 +1234,7 @@
     "en": "English",
     "pt": "Português"
    },
-   "default_language": "en",
+   "default_language": "pt",
    "currency": "EUR",
    "price_format": {
     "en": {
@@ -1488,7 +1488,7 @@
     "en": "English",
     "th": "ภาษาไทย"
    },
-   "default_language": "en",
+   "default_language": "th",
    "currency": "THB",
    "price_format": {
     "en": {
