@@ -50,7 +50,7 @@ def _num(value: Any) -> float | None:
 
 
 def _price_pair(obj: Any) -> float | None:
-    """Pick inclTax when present, else exclTax (Canadian prices are shown before tax)."""
+    """Pick inclTax when present, else exclTax (some markets, e.g. in North America, show prices before tax)."""
 
     if not isinstance(obj, dict):
         return _num(obj)
@@ -278,14 +278,14 @@ def product_detail(page: dict[str, Any], summary: dict[str, Any] | None = None) 
 # --------------------------------------------------------------------------- stores and stock
 
 
-def store(raw: dict[str, Any]) -> dict[str, Any]:
+def store(raw: dict[str, Any], country: str | None = None) -> dict[str, Any]:
     address = raw.get("address") or {}
     return {
         "id": raw.get("id"),
         "name": raw.get("displayName") or raw.get("name"),
         "kind": _dig(raw, "buClassification", "name"),
         "city": address.get("city"),
-        "province": _province(address.get("stateProvinceCode")),
+        "province": _province(address.get("stateProvinceCode"), country),
         "address": address.get("displayAddress") or address.get("street"),
         "postal_code": address.get("zipCode"),
         "timezone": address.get("timezone"),
@@ -296,11 +296,13 @@ def store(raw: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _province(code: Any) -> str | None:
+def _province(code: Any, country: str | None = None) -> str | None:
     if not isinstance(code, str) or not code:
         return None
-    # The store list prefixes the country ("CAON"); show just the province.
-    return code[2:] if len(code) == 4 else code
+    # The store list prefixes the country ("USCA", "GBABE", "JP04"); show just the region part.
+    if country and len(code) > 2 and code[:2].upper() == country.upper():
+        return code[2:]
+    return code[2:] if country is None and len(code) == 4 else code
 
 
 _STOCK_LABELS = {

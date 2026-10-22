@@ -14,10 +14,10 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
-from . import __version__, auth, normalize
+from . import __version__, auth, markets, normalize
 from .client import SORT_OPTIONS, IkeaClient
 from .config import SETTABLE_KEYS, Paths, Settings, load_settings, normalize_postal_code, read_config_file, save_config
-from .errors import EXIT_USAGE, IkeaError, LoginError, UsageError
+from .errors import EXIT_USAGE, IkeaError, LoginError, MarketNotSet, UsageError
 from .output import dump_json, envelope_error, envelope_ok, kv, money, table
 
 MAX_STDIN = 1_000_000
@@ -131,8 +131,12 @@ def parse_filters(values: Sequence[str] | None) -> dict[str, Any]:
 def build_parser() -> argparse.ArgumentParser:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help="print machine-readable JSON")
-    common.add_argument("--country", default=argparse.SUPPRESS, help="market country code (default from config, 'ca')")
-    common.add_argument("--language", default=argparse.SUPPRESS, help="market language code (default from config, 'en')")
+    common.add_argument(
+        "--country", default=argparse.SUPPRESS, help="IKEA market, e.g. us, gb, de, jp (see `ikea markets`; default from config)"
+    )
+    common.add_argument(
+        "--language", default=argparse.SUPPRESS, help="language code (default from config, else the market's main language)"
+    )
     common.add_argument("--guest", action="store_true", default=argparse.SUPPRESS, help="use a guest cart/list even when logged in")
 
     p = Parser(
@@ -157,13 +161,22 @@ def build_parser() -> argparse.ArgumentParser:
     lg.add_argument("--open", action="store_true", help="open the link in the default browser")
     im = cmd(asub, "import", "import an existing session (for servers without a browser)")
     src = im.add_mutually_exclusive_group(required=True)
-    src.add_argument("--cookie", metavar="FILE", help="file ('-' = stdin) with the `auth0` cookie from ca.accounts.ikea.com")
+    src.add_argument(
+        "--cookie",
+        metavar="FILE",
+        help="file ('-' = stdin) with the `auth0` cookie from your market's accounts site (<country>.accounts.ikea.com)",
+    )
     src.add_argument("--access-token", metavar="FILE", help="file ('-' = stdin) with an access token (works 24 h, no refresh)")
     cmd(asub, "status", "show who is logged in and when the session expires")
     cmd(asub, "refresh", "refresh the access token now")
     lo = cmd(asub, "logout", "revoke the refresh token and delete the local session")
     lo.add_argument("--local-only", action="store_true", help="only delete local files, do not contact IKEA")
     lo.add_argument("--forget-guest", action="store_true", help="also forget the guest session (its cart and lists become unreachable)")
+
+    # markets
+    mk = cmd(sub, "markets", "list the IKEA countries and languages ikea-cli works with")
+    mk.add_argument("query", nargs="?", help="only markets whose code or name contains this text")
+    mk.add_argument("--all", action="store_true", help="also list countries whose IKEA website is separate and not supported")
 
     # config
     c = cmd(sub, "config", "show or change settings")
@@ -313,6 +326,9 @@ class Context:
     def interactive(self) -> bool:
         return sys.stdin.isatty() and not getattr(self.args, "json", False)
 
+    def money(self, value: Any, currency: str | None = None) -> str:
+        return self.client.format_price(value, currency) if value is not None else "-"
+
 
 def confirm(ctx: Context, question: str, yes: bool) -> None:
     if yes:
@@ -461,7 +477,7 @@ def h_auth(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
             [
                 ("Logged in as", summary.get("name") or summary.get("email") or "IKEA customer"),
                 ("Email", summary.get("email")),
-                ("Market", ctx.settings.country.upper()),
+                ("Market", f"{ctx.client.market.name} ({ctx.client.cc})"),
                 ("Loyalty", ", ".join(summary.get("loyalty_programs") or []) or None),
                 ("Access token", f"valid for {left // 3600} h {left % 3600 // 60} min" if left else "expired (will refresh)"),
                 ("Auto-refresh", summary["can_refresh"]),
@@ -503,23 +519,103 @@ def h_config(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
     if action == "show":
         data = ctx.settings.to_dict()
         data["verified_market"] = ctx.settings.verified
-        return data, kv([(k, v) for k, v in data.items()])
+        market = markets.get(ctx.settings.country)
+        data["market_name"] = market.name if market else None
+        data["currency"] = market.currency if market else None
+        text = kv([(k, v) for k, v in data.items()])
+        if not ctx.settings.country:
+            text = (text + "\n\n" if text else "") + "No market set. Pick one from `ikea markets`, then: ikea config set country CODE"
+        return data, text
     current = read_config_file(ctx.paths)
     if action == "set":
         value: Any = args.value
-        if args.key == "postal_code":
-            value = normalize_postal_code(value)
-        if args.key == "store":
-            value = ctx.client.find_store(value)["id"]
-        trial = {**current, args.key: value}
+        notes: list[str] = []
+        trial = dict(current)
+        if args.key == "country":
+            market, language = markets.resolve(value, current.get("language") if _offers(value, current.get("language")) else None)
+            value = market.country
+            if current.get("country") and current["country"] != value:
+                for key in ("store", "postal_code"):
+                    if trial.pop(key, None) is not None:
+                        notes.append(f"Removed {key} (it belonged to the previous market).")
+            if current.get("language") and current["language"] != language:
+                notes.append(
+                    f"Language set to {language} ({market.languages[language]}); IKEA {market.name} offers {', '.join(market.languages)}."
+                )
+            trial["language"] = language
+        else:
+            if not ctx.settings.country:
+                raise MarketNotSet("Choose your IKEA market before other settings.")
+            if args.key == "language":
+                value = markets.resolve(ctx.settings.country, value)[1]
+            if args.key == "postal_code":
+                value = normalize_postal_code(value)
+            if args.key == "store":
+                value = ctx.client.find_store(value)["id"]
+        trial[args.key] = value
+        if ctx.settings.implicit_country and "country" not in trial:
+            trial["country"] = ctx.settings.country
         Settings(**{k: v for k, v in trial.items() if k in SETTABLE_KEYS})  # validate
         save_config(ctx.paths, trial)
-        return trial, f"Set {args.key} = {value}"
+        return trial, "\n".join([f"Set {args.key} = {value}", *notes])
     if action == "unset":
         current.pop(args.key, None)
         save_config(ctx.paths, current)
         return current, f"Removed {args.key}"
     raise UsageError("Choose an action: show, set, unset, path.")
+
+
+def _offers(country: str, language: str | None) -> bool:
+    market = markets.get(country)
+    return bool(market and language and language in market.languages)
+
+
+def h_markets(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
+    matches = markets.search(args.query)
+    found = [m for m in matches if m.has_shop]
+    data: list[dict[str, Any]] = [{**m.to_dict(), "supported": True} for m in found]
+    rows = [
+        [
+            m.country + (" *" if m.country == ctx.settings.country else ""),
+            m.name,
+            ", ".join(m.languages),
+            m.currency,
+            m.tested or "-",
+        ]
+        for m in found
+    ]
+    text = table(rows, ["Code", "Country", "Languages", "Currency", "Tested"]) if rows else "No market matches."
+    if args.all:
+        q = (args.query or "").lower()
+        others = [
+            {"country": cc, "name": o.get("name"), "url": o.get("url"), "served_by": o.get("served_by"), "supported": False}
+            for cc, o in sorted(markets.other_sites().items())
+            if not q or q == cc or q in str(o.get("name") or "").lower()
+        ]
+        others += [
+            {
+                "country": m.country,
+                "name": m.name,
+                "url": f"https://www.ikea.com/{m.country}/{m.default_language}/",
+                "served_by": None,
+                "supported": False,
+            }
+            for m in matches
+            if not m.has_shop
+        ]
+        data.extend(others)
+        if others:
+            text += "\n\nNot supported (separate IKEA websites, or no online range):\n" + table(
+                [[o["country"], o["name"], f"use {o['served_by']}" if o.get("served_by") else o["url"]] for o in others],
+                ["Code", "Country", "Website"],
+            )
+    elif rows:
+        text += "\n\nSet yours with: ikea config set country CODE   (--all also lists unsupported countries)"
+    if rows and ctx.settings.country:
+        text += "\n* = your market"
+    if markets.table_date():
+        text += f"\nMarket list from ikea.com, {markets.table_date()}. Tested = guest features last checked live."
+    return data, text
 
 
 # --------------------------------------------------------------------------- catalogue
@@ -568,7 +664,7 @@ def h_search(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
             normalize.format_item_no(i["item_no"] or ""),
             i["name"],
             ", ".join(x for x in (i["type_name"], i["description"], i["measure"]) if x),
-            money(i["price"], i["currency"]),
+            ctx.money(i["price"], i["currency"]),
             f"{i['rating']:.1f} ({i['rating_count']})" if i.get("rating") else "-",
         ]
         for i in items
@@ -601,7 +697,7 @@ def h_product(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
         ("Type", p.get("type_name") or p.get("description")),
         ("Description", p.get("description") if p.get("type_name") else None),
         ("Size", p.get("measure")),
-        ("Price", money(p.get("price"), p.get("currency"))),
+        ("Price", ctx.money(p.get("price"), p.get("currency"))),
         ("Rating", f"{p['rating']:.1f} / 5 ({p.get('rating_count')} reviews)" if p.get("rating") else None),
         ("Online", None if p.get("online_sellable") is None else ("can be bought online" if p["online_sellable"] else "in store only")),
         ("Designer", p.get("designer")),
@@ -641,7 +737,7 @@ def h_stores(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
     default = ctx.settings.store
     rows = [[s["id"] + (" *" if s["id"] == default else ""), s["name"], s.get("city"), s.get("province"), s.get("kind")] for s in stores]
     note = "\n* = your default store" if default else "\nSet a default with: ikea store set ID"
-    return stores, table(rows, ["Id", "Store", "City", "Prov.", "Type"]) + note
+    return stores, table(rows, ["Id", "Store", "City", "Region", "Type"]) + note
 
 
 def h_store(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
@@ -713,19 +809,24 @@ def h_delivery(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]
     result = ctx.client.delivery(items or None, postal_code=args.postal_code, store=store, from_cart=not items)
     hd, cc = result["home_delivery"], result["click_and_collect"]
     if hd["price"] is not None:
-        home = money(hd["price"])
+        home = ctx.money(hd["price"])
     elif any(i["home_delivery"] for i in result["items"]):
         home = "no price offered for these items alone (IKEA may need a larger order)"
     else:
         home = "not available"
     if cc["price"] is not None:
-        collect = money(cc["price"])
+        collect = ctx.money(cc["price"])
     else:
         collect = "not available" if result.get("store_id") else "set a store to check"
     lines = [
-        f"Postal code {result['postal_code']} ({result.get('city') or '?'}, {result.get('province') or '?'})",
+        f"Postal code {result['postal_code']}"
+        + (
+            f" ({', '.join(x for x in (result.get('city'), result.get('province')) if x)})"
+            if result.get("city") or result.get("province")
+            else ""
+        ),
         f"Home delivery:     {home}"
-        + (f"  (was {money(hd['original_price'])})" if hd.get("original_price") and hd["original_price"] != hd["price"] else "")
+        + (f"  (was {ctx.money(hd['original_price'])})" if hd.get("original_price") and hd["original_price"] != hd["price"] else "")
         + (f", about {hd['lead_time_days']} days" if hd.get("lead_time_days") else ""),
         f"Click & collect:   {collect}" + (f", about {cc['lead_time_days']} days" if cc.get("lead_time_days") else ""),
     ]
@@ -745,7 +846,7 @@ def h_delivery(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]
 # --------------------------------------------------------------------------- cart
 
 
-def render_cart(cart: dict[str, Any]) -> str:
+def render_cart(cart: dict[str, Any], price: Callable[[Any, str | None], str] = money) -> str:
     who = "Guest cart" if cart.get("guest") else "Your IKEA cart"
     if cart["empty"] or not cart["items"]:
         return f"{who} is empty."
@@ -756,17 +857,17 @@ def render_cart(cart: dict[str, Any]) -> str:
             i["name"],
             ", ".join(x for x in (i.get("type_name"), i.get("description"), i.get("measure")) if x),
             i["quantity"],
-            money(i["unit_price"], cur),
-            money(i["subtotal"], cur),
+            price(i["unit_price"], cur),
+            price(i["subtotal"], cur),
         ]
         for i in cart["items"]
     ]
     text = f"{who}: {cart['lines']} lines, {cart['quantity']} items\n\n"
     text += table(rows, ["Item", "Name", "Description", "Qty", "Each", "Subtotal"], align_right=[3, 4, 5])
     total_label = "Total (before tax)" if cart.get("total_incl_tax") is None else "Total"
-    text += f"\n\n{total_label}: {money(cart['total'], cur)}"
+    text += f"\n\n{total_label}: {price(cart['total'], cur)}"
     if cart.get("savings"):
-        text += f"   You save: {money(cart['savings'], cur)}"
+        text += f"   You save: {price(cart['savings'], cur)}"
     if cart.get("discount_codes"):
         text += f"\nDiscount codes: {', '.join(map(str, cart['discount_codes']))}"
     return text
@@ -777,7 +878,7 @@ def h_cart(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
     cl = ctx.client
     if action == "show":
         cart = cl.cart()
-        return cart, render_cart(cart)
+        return cart, render_cart(cart, ctx.money)
     if action == "add":
         items = [parse_item_spec(i) for i in args.items]
         if args.file:
@@ -785,7 +886,7 @@ def h_cart(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
         if not items:
             raise UsageError("Give items to add, e.g. `ikea cart add 304.499.08:2`, or --file.")
         cart = cl.cart_add(items)
-        return cart, f"Added {sum(q for _, q in items)} item(s).\n\n" + render_cart(cart)
+        return cart, f"Added {sum(q for _, q in items)} item(s).\n\n" + render_cart(cart, ctx.money)
     if action == "set":
         if len(args.items) == 2 and args.items[1].isdigit() and len(args.items[1]) <= 3 and ":" not in args.items[0]:
             items = [(args.items[0], int(args.items[1]))]
@@ -796,29 +897,29 @@ def h_cart(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
                     raise UsageError(f"Give the quantity as ITEM:QTY ({spec!r}).")
                 items.append(parse_item_spec(spec))
         cart = cl.cart_set(items)
-        return cart, "Updated.\n\n" + render_cart(cart)
+        return cart, "Updated.\n\n" + render_cart(cart, ctx.money)
     if action == "remove":
         cart = cl.cart_remove(args.items)
-        return cart, "Removed.\n\n" + render_cart(cart)
+        return cart, "Removed.\n\n" + render_cart(cart, ctx.money)
     if action == "clear":
         confirm(ctx, "Remove everything from the cart?", args.yes)
         cart = cl.cart_clear()
         return cart, "Cart cleared."
     if action == "coupon":
         cart = cl.cart_add_coupon(args.code) if args.op == "add" else cl.cart_remove_coupon(args.code)
-        return cart, ("Discount code added." if args.op == "add" else "Discount code removed.") + "\n\n" + render_cart(cart)
+        return cart, ("Discount code added." if args.op == "add" else "Discount code removed.") + "\n\n" + render_cart(cart, ctx.money)
     raise UsageError("Choose an action: show, add, set, remove, clear, coupon.")
 
 
 # --------------------------------------------------------------------------- favourites
 
 
-def render_list(lst: dict[str, Any]) -> str:
+def render_list(lst: dict[str, Any], price: Callable[[Any, str | None], str] = money) -> str:
     title = f"{lst['name'] or '(unnamed list)'}{' [selected]' if lst['selected'] else ''}  id {lst['list_id']}"
     if not lst["items"]:
         return title + "\n(empty)"
     rows = [
-        [normalize.format_item_no(i["item_no"] or ""), i["name"], i.get("description"), i["quantity"], money(i.get("unit_price"))]
+        [normalize.format_item_no(i["item_no"] or ""), i["name"], i.get("description"), i["quantity"], price(i.get("unit_price"), None)]
         for i in lst["items"]
     ]
     return title + "\n" + table(rows, ["Item", "Name", "Description", "Qty", "Price"], align_right=[3, 4])
@@ -835,7 +936,7 @@ def h_lists(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
         return lists, table(rows, ["Id", "Name", "Items", "Selected", "Updated"])
     if action == "show":
         lst = cl.get_list(args.list)
-        return lst, render_list(lst)
+        return lst, render_list(lst, ctx.money)
     if action == "create":
         lst = cl.list_create(args.name)
         return lst, f"Created list {lst['name']!r} ({lst['list_id']})."
@@ -852,10 +953,10 @@ def h_lists(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
     if action in ("add", "set"):
         items = [parse_item_spec(i) for i in args.items]
         lst = cl.list_add(items, list_ref=args.list) if action == "add" else cl.list_set(items, list_ref=args.list)
-        return lst, render_list(lst)
+        return lst, render_list(lst, ctx.money)
     if action == "remove":
         lst = cl.list_remove(args.items, list_ref=args.list)
-        return lst, render_list(lst)
+        return lst, render_list(lst, ctx.money)
     raise UsageError("Unknown lists action.")
 
 
@@ -959,6 +1060,7 @@ def h_profile(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
 HANDLERS: dict[str, Handler] = {
     "auth": h_auth,
     "config": h_config,
+    "markets": h_markets,
     "search": h_search,
     "suggest": h_suggest,
     "categories": h_categories,
@@ -978,6 +1080,21 @@ HANDLERS: dict[str, Handler] = {
 
 # =========================================================================== main
 
+MARKET_FREE = ("config", "markets")
+
+
+def _save_implicit_country(ctx: Context) -> None:
+    """Earlier versions always used Canada without storing it; write it down once so it stays explicit."""
+
+    current = read_config_file(ctx.paths)
+    current.setdefault("country", ctx.settings.country)
+    save_config(ctx.paths, current)
+    print(
+        f"note: ikea-cli now supports many countries. Your settings had none, so '{ctx.settings.country}' was saved "
+        "(as before). Change it with `ikea config set country CODE`.",
+        file=sys.stderr,
+    )
+
 
 def main(argv: Sequence[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
@@ -991,11 +1108,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.print_help(sys.stderr)
             return EXIT_USAGE
         ctx = Context(args, Paths.default())
-        if not ctx.settings.verified and args.command not in ("config",):
-            print(
-                f"note: market {ctx.settings.country}/{ctx.settings.language} has not been tested with ikea-cli; Canada is.",
-                file=sys.stderr,
-            )
+        if args.command not in MARKET_FREE:
+            ctx.settings.market()  # clear error if no market is set or it can't be served
+            if ctx.settings.implicit_country:
+                _save_implicit_country(ctx)
+            if not ctx.settings.verified and not want_json:
+                print(
+                    f"note: ikea-cli has not been tested in {ctx.settings.country}/{ctx.settings.language} yet; "
+                    "please report anything that does not work.",
+                    file=sys.stderr,
+                )
         data, text = HANDLERS[args.command](args, ctx)
         if want_json:
             dump_json(envelope_ok(data))

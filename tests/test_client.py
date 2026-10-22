@@ -30,7 +30,7 @@ def login(client, expires_in=3600):
 
 def test_search_builds_request_and_normalizes(router, make_client):
     router.add("POST", SEARCH, load_fixture("search.json"))
-    client = make_client(settings=Settings(store="101", postal_code="a1a1a1"))
+    client = make_client(settings=Settings(country="ca", store="101", postal_code="zz99zz"))
     result = client.search("table", filters={"colors": "10139,10156", "new-product": True}, sort="price-asc", limit=10, offset=20)
 
     req = router.last("POST", "/search")
@@ -39,7 +39,7 @@ def test_search_builds_request_and_normalizes(router, make_client):
     body = json.loads(req.content)
     assert body["searchParameters"] == {"input": "table", "type": "QUERY"}
     assert body["store"] == "101"
-    assert body["zip"] == "A1A1A1"
+    assert body["zip"] == "ZZ99ZZ"
     comp = body["components"][0]
     assert comp["window"] == {"size": 10, "offset": 20}
     assert comp["sort"] == "PRICE_LOW_TO_HIGH"
@@ -180,7 +180,7 @@ def test_stores_cached_and_hidden_filtered(router, make_client):
     client = make_client()
     stores = client.stores()
     assert [s["id"] for s in stores] == ["202", "101"]
-    assert stores[1]["province"] == "ON"
+    assert stores[1]["province"] == "QQ"
     client.stores()
     assert len(router.requests) == 1
     assert client.find_store("testville")["id"] == "101"
@@ -233,12 +233,12 @@ def test_stock_validation(make_client):
 def test_delivery(router, make_client):
     add_guest(router)
     router.add(
-        "POST", "https://api.ingka.ikea.com/address/location", {"postCode": "A1A1A1", "matches": [{"stateCode": "ON", "city": "Testville"}]}
+        "POST", "https://api.ingka.ikea.com/address/location", {"postCode": "ZZ99ZZ", "matches": [{"stateCode": "QQ", "city": "Testville"}]}
     )
     router.add("POST", "https://web-api.ikea.com/cart-bff-cf/api/v2/fulfilment", load_fixture("fulfilment.json"))
-    result = make_client().delivery([("12345678", 2)], postal_code="a1a 1a1", store="101")
+    result = make_client().delivery([("12345678", 2)], postal_code="zz9 9zz", store="101")
     body = router.body("POST", "/fulfilment")
-    assert body["address"] == {"postalCode": "A1A1A1", "stateCode": "ON", "storeId": "101", "country": "ca", "language": "en"}
+    assert body["address"] == {"postalCode": "ZZ99ZZ", "stateCode": "QQ", "storeId": "101", "country": "ca", "language": "en"}
     assert body["items"] == [{"itemNo": "12345678", "quantity": 2, "type": "ART", "childItems": []}]
     assert body["consumerName"] == "Web"
     assert router.last("POST", "/fulfilment").headers["authorization"].startswith("Bearer ")
@@ -248,7 +248,7 @@ def test_delivery(router, make_client):
     item = result["items"][0]
     assert item["in_store"] is False
     assert item["in_store_restock"] == {"earliestDate": "2026-02-01", "latestDate": "2026-02-03"}
-    assert result["province"] == "ON"
+    assert result["province"] == "QQ"
 
 
 def test_delivery_needs_postal_code(make_client):

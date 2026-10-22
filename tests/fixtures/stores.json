@@ -3,14 +3,14 @@
   "id": "101",
   "name": "IKEA Testville",
   "displayName": "IKEA Testville",
-  "lat": "45.0",
-  "lng": "-75.0",
+  "lat": "0.0",
+  "lng": "0.0",
   "address": {
    "city": "Testville",
-   "stateProvinceCode": "CAON",
+   "stateProvinceCode": "CAQQ",
    "displayAddress": "1 Example Road",
-   "zipCode": "A1A 1A1",
-   "timezone": "America/Toronto"
+   "zipCode": "ZZ9 9ZZ",
+   "timezone": "UTC"
   },
   "hours": {
    "normal": [
@@ -31,11 +31,11 @@
   "id": "202",
   "name": "IKEA Sampleton",
   "displayName": "IKEA Sampleton",
-  "lat": "49.0",
-  "lng": "-123.0",
+  "lat": "1.0",
+  "lng": "1.0",
   "address": {
    "city": "Sampleton",
-   "stateProvinceCode": "CABC"
+   "stateProvinceCode": "CARR"
   },
   "hours": {
    "normal": []

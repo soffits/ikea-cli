@@ -1,0 +1,1618 @@
+{
+ "generated": "2026-10-22",
+ "source": "scripts/update_markets.py",
+ "markets": {
+  "ae": {
+   "name": "United Arab Emirates",
+   "keywords": [
+    "United Arab Emirates",
+    "الإمارات العربية المتحدة",
+    "UAE"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "AED",
+   "price_format": {
+    "ar": {
+     "prefix": "درهم",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "Dhs",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "at": {
+   "name": "Austria",
+   "keywords": [
+    "Österreich",
+    "Austria"
+   ],
+   "languages": {
+    "de": "Deutsch",
+    "en": "English"
+   },
+   "default_language": "de",
+   "currency": "EUR",
+   "price_format": {
+    "de": {
+     "prefix": "€",
+     "suffix": ",-",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "en": {
+     "prefix": "€",
+     "suffix": ",-",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "at.accounts.ikea.com",
+    "client_id": "Fc6HpQgElMRb90uqwmwPXbQE2h5ueA6i"
+   }
+  },
+  "au": {
+   "name": "Australia",
+   "keywords": [
+    "Australia"
+   ],
+   "languages": {
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "AUD",
+   "price_format": {
+    "en": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "au.accounts.ikea.com",
+    "client_id": "HXUSz2Yppi5snAqTk9ikVOP5s7WdabJR"
+   }
+  },
+  "be": {
+   "name": "Belgium",
+   "keywords": [
+    "België",
+    "Belgium",
+    "Belgique"
+   ],
+   "languages": {
+    "en": "English",
+    "fr": "Français",
+    "nl": "Nederlands"
+   },
+   "default_language": "fr",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "fr": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "nl": {
+     "prefix": "€",
+     "suffix": "",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "be.accounts.ikea.com",
+    "client_id": "2mcBkBabm2yxhakaKlrteT0Zs2ZcSNLa"
+   }
+  },
+  "bh": {
+   "name": "Bahrain",
+   "keywords": [
+    "Bahrain",
+    "Bahrain",
+    "البحرين",
+    "al-Baḥrayn"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "BHD",
+   "price_format": {
+    "ar": {
+     "prefix": "دينار",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "BD",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "au.accounts.ikea.com",
+    "client_id": "HXUSz2Yppi5snAqTk9ikVOP5s7WdabJR"
+   }
+  },
+  "ca": {
+   "name": "Canada",
+   "keywords": [
+    "Canada"
+   ],
+   "languages": {
+    "en": "English",
+    "fr": "Français"
+   },
+   "default_language": "en",
+   "currency": "CAD",
+   "price_format": {
+    "en": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    },
+    "fr": {
+     "prefix": "",
+     "suffix": "$",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "ca.accounts.ikea.com",
+    "client_id": "jUflsyuJkwbC0RQg1i8bgo1dyld6NM5d"
+   }
+  },
+  "ch": {
+   "name": "Switzerland",
+   "keywords": [
+    "Schweiz",
+    "Switzerland",
+    "Suisse",
+    "Svizzera"
+   ],
+   "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "it": "Italiano"
+   },
+   "default_language": "en",
+   "currency": "CHF",
+   "price_format": {
+    "de": {
+     "prefix": "CHF",
+     "suffix": "",
+     "decimals": 2,
+     "group": "'",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "CHF",
+     "suffix": "",
+     "decimals": 2,
+     "group": "'",
+     "decimal": "."
+    },
+    "fr": {
+     "prefix": "CHF",
+     "suffix": "",
+     "decimals": 2,
+     "group": "'",
+     "decimal": "."
+    },
+    "it": {
+     "prefix": "CHF",
+     "suffix": "",
+     "decimals": 2,
+     "group": "'",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "ch.accounts.ikea.com",
+    "client_id": "bs5g5nRzaloE8XlV2UrLC1Vx0r4Y0tpU"
+   }
+  },
+  "cl": {
+   "name": "Chile",
+   "keywords": [
+    "Chile"
+   ],
+   "languages": {
+    "es": "Español"
+   },
+   "default_language": "es",
+   "currency": "CLP",
+   "price_format": {
+    "es": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 0,
+     "group": ".",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "co": {
+   "name": "Colombia",
+   "keywords": [
+    "Colombia"
+   ],
+   "languages": {
+    "es": "Español"
+   },
+   "default_language": "es",
+   "currency": "COP",
+   "price_format": {
+    "es": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 0,
+     "group": ".",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "cz": {
+   "name": "Czechia",
+   "keywords": [
+    "Česká republika",
+    "Czech Republic"
+   ],
+   "languages": {
+    "cs": "Čeština",
+    "en": "English"
+   },
+   "default_language": "cs",
+   "currency": "CZK",
+   "price_format": {
+    "cs": {
+     "prefix": "",
+     "suffix": ",–",
+     "decimals": 0,
+     "group": " ",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "",
+     "suffix": ",–",
+     "decimals": 0,
+     "group": " ",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "cz.accounts.ikea.com",
+    "client_id": "xWyvXOrWbledSIQozohFJifwBy1wWchp"
+   }
+  },
+  "de": {
+   "name": "Germany",
+   "keywords": [
+    "Deutschland",
+    "Germany"
+   ],
+   "languages": {
+    "de": "Deutsch",
+    "en": "English"
+   },
+   "default_language": "de",
+   "currency": "EUR",
+   "price_format": {
+    "de": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": "",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": "",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "de.accounts.ikea.com",
+    "client_id": "po7A70WYX6DeSRiKRKBJocsCxZHLyUUq"
+   }
+  },
+  "dk": {
+   "name": "Denmark",
+   "keywords": [
+    "Danmark",
+    "Denmark"
+   ],
+   "languages": {
+    "da": "Dansk"
+   },
+   "default_language": "da",
+   "currency": "DKK",
+   "price_format": {
+    "da": {
+     "prefix": "",
+     "suffix": ".-",
+     "decimals": 0,
+     "group": ".",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "dk.accounts.ikea.com",
+    "client_id": "LUSrk5e6FJ01XGDNuKi1rRg58qBQvhUu"
+   }
+  },
+  "ee": {
+   "name": "Estonia",
+   "keywords": [
+    "Estonia",
+    "Republic of Estonia",
+    "Eesti Vabariik",
+    "Eesti"
+   ],
+   "languages": {
+    "en": "English",
+    "et": "Eesti",
+    "ru": "Pусский"
+   },
+   "default_language": "et",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "et": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "ru": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": null
+  },
+  "eg": {
+   "name": "Egypt",
+   "keywords": [
+    "Egypt",
+    "مَصر"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "EGP",
+   "price_format": {
+    "ar": {
+     "prefix": "جنيه",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "EGP",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "es": {
+   "name": "Spain",
+   "keywords": [
+    "España Península",
+    "Spain",
+    "Espana"
+   ],
+   "languages": {
+    "ca": "ca",
+    "en": "English",
+    "es": "Español",
+    "eu": "eu",
+    "gl": "gl"
+   },
+   "default_language": "en",
+   "currency": "EUR",
+   "price_format": {
+    "ca": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "en": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "es": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "eu": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "gl": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "es.accounts.ikea.com",
+    "client_id": "dpnp2umABISPNJvm28dZ2gJQzXNhQs3m"
+   }
+  },
+  "fi": {
+   "name": "Finland",
+   "keywords": [
+    "Suomi",
+    "Finland"
+   ],
+   "languages": {
+    "en": "English",
+    "fi": "Suomi",
+    "sv": "Svenska"
+   },
+   "default_language": "fi",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": ",-",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    },
+    "fi": {
+     "prefix": "",
+     "suffix": ",-",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    },
+    "sv": {
+     "prefix": "",
+     "suffix": ",-",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "fi.accounts.ikea.com",
+    "client_id": "2G9e0d3JM8v4vBmDGBOozj7fnv8wT3le"
+   }
+  },
+  "fr": {
+   "name": "France",
+   "keywords": [
+    "France"
+   ],
+   "languages": {
+    "fr": "Français"
+   },
+   "default_language": "fr",
+   "currency": "EUR",
+   "price_format": {
+    "fr": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "fr.accounts.ikea.com",
+    "client_id": "IhBz7Kf2VtAKXadfMJA13pmXrEES0JSt"
+   }
+  },
+  "gb": {
+   "name": "United Kingdom",
+   "keywords": [
+    "United Kingdom",
+    "Great Brittain",
+    "England",
+    "Wales",
+    "Scotland"
+   ],
+   "languages": {
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "GBP",
+   "price_format": {
+    "en": {
+     "prefix": "£",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "gb.accounts.ikea.com",
+    "client_id": "gqzXNCUVxgtykE7iLmA8VLJtz5MbRFh0"
+   }
+  },
+  "hr": {
+   "name": "Croatia",
+   "keywords": [
+    "Hrvatska",
+    "Croatia"
+   ],
+   "languages": {
+    "hr": "Hrvatski"
+   },
+   "default_language": "hr",
+   "currency": "EUR",
+   "price_format": {
+    "hr": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "hr.accounts.ikea.com",
+    "client_id": "4m02yxRb74ln1HGl9fsVMDYsvUOPXb8P"
+   }
+  },
+  "hu": {
+   "name": "Hungary",
+   "keywords": [
+    "Magyarország",
+    "Hungary"
+   ],
+   "languages": {
+    "hu": "Magyar"
+   },
+   "default_language": "hu",
+   "currency": "HUF",
+   "price_format": {
+    "hu": {
+     "prefix": "",
+     "suffix": "Ft",
+     "decimals": 0,
+     "group": " ",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "hu.accounts.ikea.com",
+    "client_id": "z5gJWWARn9Imbwg0a44tPQ4P0w18bLc2"
+   }
+  },
+  "ie": {
+   "name": "Ireland",
+   "keywords": [
+    "Eire",
+    "Ireland"
+   ],
+   "languages": {
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "€",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "ie.accounts.ikea.com",
+    "client_id": "sa3xnsi140oH8M2QavGN26n5BLF1lWkr"
+   }
+  },
+  "il": {
+   "name": "Israel",
+   "keywords": [
+    "Israel",
+    "יִשְׂרָאֵל",
+    "إسرائيل"
+   ],
+   "languages": {
+    "he": "עברית"
+   },
+   "default_language": "he",
+   "currency": "ILS",
+   "price_format": {
+    "he": {
+     "prefix": "‏₪",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "in": {
+   "name": "India",
+   "keywords": [
+    "India"
+   ],
+   "languages": {
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "INR",
+   "price_format": {
+    "en": {
+     "prefix": "Rs.",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "in.accounts.ikea.com",
+    "client_id": "PxVvHZuJapEjzOsDXYaxNXr5m5r2ZQ5s"
+   }
+  },
+  "it": {
+   "name": "Italy",
+   "keywords": [
+    "Italia",
+    "Italy"
+   ],
+   "languages": {
+    "it": "Italiano"
+   },
+   "default_language": "it",
+   "currency": "EUR",
+   "price_format": {
+    "it": {
+     "prefix": "€",
+     "suffix": "",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "it.accounts.ikea.com",
+    "client_id": "TfgQrqkcNv8cSG3QJLXuUGD27vAUMzeI"
+   }
+  },
+  "jo": {
+   "name": "Jordan",
+   "keywords": [
+    "Jordan",
+    "الأردن"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "JOD",
+   "price_format": {
+    "ar": {
+     "prefix": "د.أ",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "JD",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "jp": {
+   "name": "Japan",
+   "keywords": [
+    "日本",
+    "Japan"
+   ],
+   "languages": {
+    "en": "English",
+    "ja": "日本語"
+   },
+   "default_language": "en",
+   "currency": "JPY",
+   "price_format": {
+    "en": {
+     "prefix": "¥",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    },
+    "ja": {
+     "prefix": "¥",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "jp.accounts.ikea.com",
+    "client_id": "venUm2uZEvyo2u5SCVdmPdT31BVc3G00"
+   }
+  },
+  "kr": {
+   "name": "South Korea",
+   "keywords": [
+    "대한민국",
+    "South Korea"
+   ],
+   "languages": {
+    "en": "English",
+    "ko": "한국어"
+   },
+   "default_language": "en",
+   "currency": "KRW",
+   "price_format": {
+    "en": {
+     "prefix": "￦",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    },
+    "ko": {
+     "prefix": "￦",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "kr.accounts.ikea.com",
+    "client_id": "m5HVZNyFI10O49sogQQb2UIUsySsGV29"
+   }
+  },
+  "kw": {
+   "name": "Kuwait",
+   "keywords": [
+    "Kuwait",
+    "الكويت"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "KWD",
+   "price_format": {
+    "ar": {
+     "prefix": "د.ك",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "KD",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "lt": {
+   "name": "Lithuania",
+   "keywords": [
+    "Lietuva",
+    "Lithuania",
+    "Литва"
+   ],
+   "languages": {
+    "en": "English",
+    "lt": "Lietuvių kalba",
+    "ru": "Pусский"
+   },
+   "default_language": "lt",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "lt": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    },
+    "ru": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": null
+  },
+  "lv": {
+   "name": "Latvia",
+   "keywords": [
+    "Latvija",
+    "Latvia",
+    "Латвия",
+    "Läti"
+   ],
+   "languages": {
+    "en": "English",
+    "lv": "Latviešu Valoda",
+    "ru": "Pусский"
+   },
+   "default_language": "lv",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "lv": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    },
+    "ru": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": null
+  },
+  "ma": {
+   "name": "Morocco",
+   "keywords": [
+    "Maroc",
+    "المغرب",
+    "Morocco",
+    "al-maġhrib",
+    ": المملكة المغربية"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English",
+    "fr": "Français"
+   },
+   "default_language": "en",
+   "currency": "MAD",
+   "price_format": {
+    "ar": {
+     "prefix": "درهم",
+     "suffix": "",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    },
+    "en": {
+     "prefix": "",
+     "suffix": "DH",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    },
+    "fr": {
+     "prefix": "",
+     "suffix": "DH",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": null
+  },
+  "mx": {
+   "name": "Mexico",
+   "keywords": [
+    "México",
+    "Mexico",
+    "المغرب"
+   ],
+   "languages": {
+    "en": "English",
+    "es": "Español"
+   },
+   "default_language": "en",
+   "currency": "MXN",
+   "price_format": {
+    "en": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 0,
+     "group": " ",
+     "decimal": "."
+    },
+    "es": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 0,
+     "group": " ",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "my": {
+   "name": "Malaysia",
+   "keywords": [
+    "Malaysia",
+    "Malaysia",
+    "Malay"
+   ],
+   "languages": {
+    "en": "English",
+    "ms": "Bahasa Melayu"
+   },
+   "default_language": "en",
+   "currency": "MYR",
+   "price_format": {
+    "en": {
+     "prefix": "RM",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    },
+    "ms": {
+     "prefix": "RM",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "nl": {
+   "name": "Netherlands",
+   "keywords": [
+    "Nederland",
+    "Netherlands"
+   ],
+   "languages": {
+    "en": "English",
+    "nl": "Nederlands"
+   },
+   "default_language": "en",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "€",
+     "suffix": ".-",
+     "decimals": 2,
+     "group": "",
+     "decimal": "."
+    },
+    "nl": {
+     "prefix": "€",
+     "suffix": ".-",
+     "decimals": 2,
+     "group": "",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "nl.accounts.ikea.com",
+    "client_id": "nHmIKICLhYSdRSVIDt4kWhGVm3jINalt"
+   }
+  },
+  "no": {
+   "name": "Norway",
+   "keywords": [
+    "Norge",
+    "Norway"
+   ],
+   "languages": {
+    "en": "English",
+    "no": "Norsk"
+   },
+   "default_language": "no",
+   "currency": "NOK",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": ",-",
+     "decimals": 0,
+     "group": ".",
+     "decimal": "."
+    },
+    "no": {
+     "prefix": "",
+     "suffix": ",-",
+     "decimals": 0,
+     "group": ".",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "no.accounts.ikea.com",
+    "client_id": "l38O2VaAd4oPPnS2SRpvp3YsfORjCOq0"
+   }
+  },
+  "nz": {
+   "name": "New Zealand",
+   "keywords": [
+    "New Zealand"
+   ],
+   "languages": {
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "NZD",
+   "price_format": {
+    "en": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "nz.accounts.ikea.com",
+    "client_id": "4Jq0lpZBKkop5s3AWyH6rxDgIhYaDjn4"
+   }
+  },
+  "om": {
+   "name": "Oman",
+   "keywords": [
+    "Oman",
+    "oman"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "OMR",
+   "price_format": {
+    "ar": {
+     "prefix": "ريال",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "OMR",
+     "suffix": "",
+     "decimals": 3,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "ph": {
+   "name": "Philippines",
+   "keywords": [
+    "Philippines"
+   ],
+   "languages": {
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "PHP",
+   "price_format": {
+    "en": {
+     "prefix": "₱",
+     "suffix": "",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "pl": {
+   "name": "Poland",
+   "keywords": [
+    "Polska",
+    "Poland"
+   ],
+   "languages": {
+    "pl": "Polski"
+   },
+   "default_language": "pl",
+   "currency": "PLN",
+   "price_format": {
+    "pl": {
+     "prefix": "",
+     "suffix": ",-",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "pl.accounts.ikea.com",
+    "client_id": "f2LIjaqFXyKIqZG4LomjnpmJZOENncsc"
+   }
+  },
+  "pt": {
+   "name": "Portugal",
+   "keywords": [
+    "Portugal"
+   ],
+   "languages": {
+    "en": "English",
+    "pt": "Português"
+   },
+   "default_language": "en",
+   "currency": "EUR",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    },
+    "pt": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "pt.accounts.ikea.com",
+    "client_id": "g20uhfVhIwWFyJdyDI9TJ9tUGhQn0ijd"
+   }
+  },
+  "qa": {
+   "name": "Qatar",
+   "keywords": [
+    "Qatar",
+    "قطر",
+    "Dawlat Qaṭar"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "QAR",
+   "price_format": {
+    "ar": {
+     "prefix": "ريال",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "QR",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "ro": {
+   "name": "Romania",
+   "keywords": [
+    "România",
+    "Romania"
+   ],
+   "languages": {
+    "ro": "Românã"
+   },
+   "default_language": "ro",
+   "currency": "RON",
+   "price_format": {
+    "ro": {
+     "prefix": "",
+     "suffix": "lei",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "ro.accounts.ikea.com",
+    "client_id": "fWLRPoIU4eNA8tHmAX7ENVGmoscdikao"
+   }
+  },
+  "rs": {
+   "name": "Serbia",
+   "keywords": [
+    "Srbija",
+    "Serbia"
+   ],
+   "languages": {
+    "sr": "српски"
+   },
+   "default_language": "sr",
+   "currency": "RSD",
+   "price_format": {
+    "sr": {
+     "prefix": "",
+     "suffix": "RSD",
+     "decimals": 0,
+     "group": ".",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "rs.accounts.ikea.com",
+    "client_id": "6HE38Cw6EXUgb5mNFwfYU0rtA8eYQikf"
+   }
+  },
+  "sa": {
+   "name": "Saudi Arabia",
+   "keywords": [
+    "Saudi Arabia",
+    "المملكة العربية السعودية"
+   ],
+   "languages": {
+    "ar": "العربية",
+    "en": "English"
+   },
+   "default_language": "ar",
+   "currency": "SAR",
+   "price_format": {
+    "ar": {
+     "prefix": "﷼",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    },
+    "en": {
+     "prefix": "﷼",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "au.accounts.ikea.com",
+    "client_id": "HXUSz2Yppi5snAqTk9ikVOP5s7WdabJR"
+   }
+  },
+  "se": {
+   "name": "Sweden",
+   "keywords": [
+    "Sverige",
+    "Sweden"
+   ],
+   "languages": {
+    "en": "English",
+    "sv": "Svenska"
+   },
+   "default_language": "sv",
+   "currency": "SEK",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": ":-",
+     "decimals": 0,
+     "group": " ",
+     "decimal": "."
+    },
+    "sv": {
+     "prefix": "",
+     "suffix": ":-",
+     "decimals": 0,
+     "group": " ",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "se.accounts.ikea.com",
+    "client_id": "PnoYxSpbEzktCnCV28q0L9slqW7879ln"
+   }
+  },
+  "sg": {
+   "name": "Singapore",
+   "keywords": [
+    "Singapore",
+    "Singapore"
+   ],
+   "languages": {
+    "en": "English"
+   },
+   "default_language": "en",
+   "currency": "SGD",
+   "price_format": {
+    "en": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "si": {
+   "name": "Slovenia",
+   "keywords": [
+    "Slovenia",
+    "Republic of Slovenia",
+    "Republika Slovenija",
+    "Slovenija"
+   ],
+   "languages": {
+    "sl": "Slovene"
+   },
+   "default_language": "sl",
+   "currency": "EUR",
+   "price_format": {
+    "sl": {
+     "prefix": "",
+     "suffix": "€",
+     "decimals": 2,
+     "group": ".",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "si.accounts.ikea.com",
+    "client_id": "2g9yJS5LJ8fFuatkL7gtO9MqjA2Oc6fc"
+   }
+  },
+  "sk": {
+   "name": "Slovakia",
+   "keywords": [
+    "Slovensko",
+    "Slovakia"
+   ],
+   "languages": {
+    "sk": "Slovenčina"
+   },
+   "default_language": "sk",
+   "currency": "EUR",
+   "price_format": {
+    "sk": {
+     "prefix": "€",
+     "suffix": "",
+     "decimals": 2,
+     "group": " ",
+     "decimal": ","
+    }
+   },
+   "auth": {
+    "domain": "sk.accounts.ikea.com",
+    "client_id": "f5BC6ApS5eb1secKnXNOqNAr1vZfiFD5"
+   }
+  },
+  "th": {
+   "name": "Thailand",
+   "keywords": [
+    "Thailand",
+    "ประเทศไทย"
+   ],
+   "languages": {
+    "en": "English",
+    "th": "ภาษาไทย"
+   },
+   "default_language": "en",
+   "currency": "THB",
+   "price_format": {
+    "en": {
+     "prefix": "",
+     "suffix": "THB",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    },
+    "th": {
+     "prefix": "",
+     "suffix": "บาท",
+     "decimals": 0,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": null
+  },
+  "ua": {
+   "name": "Ukraine",
+   "keywords": [
+    "Україна",
+    "Ukraine"
+   ],
+   "languages": {
+    "uk": "Українська"
+   },
+   "default_language": "uk",
+   "currency": null,
+   "price_format": {},
+   "auth": null
+  },
+  "us": {
+   "name": "United States",
+   "keywords": [
+    "United States",
+    "USA"
+   ],
+   "languages": {
+    "en": "English",
+    "es": "Español"
+   },
+   "default_language": "en",
+   "currency": "USD",
+   "price_format": {
+    "en": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    },
+    "es": {
+     "prefix": "$",
+     "suffix": "",
+     "decimals": 2,
+     "group": ",",
+     "decimal": "."
+    }
+   },
+   "auth": {
+    "domain": "us.accounts.ikea.com",
+    "client_id": "ADzEosFiFb9v9HujH78E5kV2267U1vN4"
+   }
+  }
+ },
+ "other_sites": {
+  "bg": {
+   "name": "Bulgaria",
+   "url": "https://www.ikea.bg/"
+  },
+  "ce": {
+   "name": "Islas Canarias",
+   "url": "https://canarias.ikea.es/"
+  },
+  "cn": {
+   "name": "China",
+   "url": "https://www.ikea.cn/cn/en/"
+  },
+  "cy": {
+   "name": "Cyprus",
+   "url": "https://www.ikea.com.cy/"
+  },
+  "do": {
+   "name": "Dominican Republic",
+   "url": "https://www.ikea.com.do/en/"
+  },
+  "gr": {
+   "name": "Greece",
+   "url": "https://www.ikea.gr/"
+  },
+  "hk": {
+   "name": "Hong Kong",
+   "url": "https://www.ikea.com.hk/en"
+  },
+  "id": {
+   "name": "Indonesia",
+   "url": "https://www.ikea.co.id/en"
+  },
+  "is": {
+   "name": "Iceland",
+   "url": "https://www.ikea.is/en"
+  },
+  "lu": {
+   "name": "Luxembourg",
+   "url": "https://www.ikea.com/be/fr/",
+   "served_by": "be"
+  },
+  "pr": {
+   "name": "Puerto Rico",
+   "url": "https://www.ikea.pr/puertorico/en/"
+  },
+  "sp": {
+   "name": "Islas Baleares",
+   "url": "https://baleares.ikea.es/"
+  },
+  "tr": {
+   "name": "Türkiye",
+   "url": "https://www.ikea.com.tr/en/"
+  },
+  "tw": {
+   "name": "Taiwan",
+   "url": "https://www.ikea.com.tw/en"
+  }
+ }
+}

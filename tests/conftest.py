@@ -51,6 +51,8 @@ def isolated_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         if key.startswith("IKEA_"):
             monkeypatch.delenv(key, raising=False)
     monkeypatch.setenv("IKEA_CLI_HOME", str(tmp_path / "home"))
+    # Most tests use one market; tests about choosing a market remove this.
+    monkeypatch.setenv("IKEA_COUNTRY", "ca")
     return tmp_path / "home"
 
 
@@ -102,7 +104,7 @@ def router() -> Router:
 @pytest.fixture
 def make_client(router: Router, isolated_env: Path) -> Callable[..., IkeaClient]:
     def make(**kwargs: Any) -> IkeaClient:
-        settings = kwargs.pop("settings", None) or Settings(**kwargs.pop("settings_kwargs", {}))
+        settings = kwargs.pop("settings", None) or Settings(**{"country": "ca", **kwargs.pop("settings_kwargs", {})})
         return IkeaClient(settings, paths=Paths.default(), http=httpx.Client(transport=httpx.MockTransport(router)), **kwargs)
 
     return make
