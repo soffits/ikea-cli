@@ -17,7 +17,9 @@ from .errors import UnsupportedMarket
 
 # Markets whose guest features (search, product, stores, stock, delivery, guest cart and lists,
 # login link) were checked against the live website, with the date of the last check.
-TESTED: dict[str, str] = {}
+TESTED: dict[str, str] = {
+    cc: "2026-10-22" for cc in ("ae", "au", "ca", "de", "es", "fr", "gb", "jp", "kr", "se", "us")
+}
 
 
 @dataclass(frozen=True)
