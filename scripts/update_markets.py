@@ -53,9 +53,15 @@ def log(msg: str) -> None:
 
 
 def get(url: str, **kw: Any) -> httpx.Response:
+    return send("GET", url, **kw)
+
+
+def send(method: str, url: str, **kw: Any) -> httpx.Response:
+    """One request with a short pause after it; timeouts and connection errors are retried (all calls here are read-only)."""
+
     for attempt in range(3):
         try:
-            resp = http.get(url, **kw)
+            resp = http.request(method, url, **kw)
             time.sleep(PAUSE)
             return resp
         except httpx.TransportError as exc:
@@ -135,8 +141,7 @@ def login_link_accepted(cc: str, lang: str, settings: dict[str, str]) -> bool:
         "code_challenge": "x" * 43,
         "state": "check",
     }
-    resp = http.get(f"https://{settings['domain']}/authorize", params=params, follow_redirects=True)
-    time.sleep(PAUSE)
+    resp = get(f"https://{settings['domain']}/authorize", params=params, follow_redirects=True)
     return resp.status_code == 200 and "error" not in resp.url.path and "error=" not in str(resp.url)
 
 
@@ -148,30 +153,30 @@ CART_BFF_CLIENT_ID = "c3077c7d-d57c-4206-9a77-a55e01211b1b"
 def guest_features(cc: str, lang: str) -> dict[str, bool]:
     """Which shared services accept this market, read-only and as a guest: cart, favourites, delivery check."""
 
-    resp = http.post(
+    resp = send(
+        "POST",
         "https://api.ingka.ikea.com/guest/token",
         json={"retailUnit": cc},
         headers={"x-client-id": GUEST_CLIENT_ID, "accept": "application/json;version=2"},
     )
-    time.sleep(PAUSE)
     token = resp.json().get("access_token") if resp.status_code == 200 else None
     if not token:
         return {"cart": False, "lists": False, "delivery": False}
     auth = {"authorization": f"Bearer {token}"}
-    cart = http.get(
+    cart = get(
         f"https://prod.cart.caas.selling.ingka.com/api/v1/{cc}",
         params={"shoppingProfile": "ONLINE", "group": "DEFAULT"},
         headers={**auth, "x-consumer-name": "Web Cart"},
     )
-    time.sleep(PAUSE)
-    lists = http.post(
+    lists = send(
+        "POST",
         "https://favs.oneweb.ingka.com/graphql",
         json={"query": "{lists{listId}}", "variables": {}},
         headers={**auth, "x-client-id": FAVOURITES_CLIENT_ID},
     )
-    time.sleep(PAUSE)
     # An empty item list is rejected either way; only an unknown country is reported as "invalid_enum_value".
-    delivery = http.post(
+    delivery = send(
+        "POST",
         "https://web-api.ikea.com/cart-bff-cf/api/v2/fulfilment",
         json={
             "address": {"postalCode": "", "stateCode": "", "storeId": "", "country": cc, "language": lang},
@@ -182,7 +187,6 @@ def guest_features(cc: str, lang: str) -> dict[str, bool]:
         },
         headers={**auth, "x-client-id": CART_BFF_CLIENT_ID, "x-request-id": "00000000-0000-4000-8000-000000000000"},
     )
-    time.sleep(PAUSE)
     return {
         "cart": cart.status_code == 200,
         "lists": lists.status_code == 200 and "errors" not in lists.text[:20],
@@ -197,13 +201,13 @@ def _search(cc: str, lang: str, sort: str, text: str) -> list[dict[str, Any]]:
             {"component": "PRIMARY_AREA", "types": {"main": "PRODUCT", "breakouts": []}, "window": {"size": 24, "offset": 0}, "sort": sort}
         ],
     }
-    resp = http.post(
+    resp = send(
+        "POST",
         f"https://sik.search.blue.cdtapps.com/{cc}/{lang}/search",
         params={"c": "sr", "v": SEARCH_VERSION},
         content=json.dumps(body),
         headers={"content-type": "text/plain;charset=UTF-8"},
     )
-    time.sleep(PAUSE)
     if resp.status_code != 200:
         return []
     primary = next((r for r in resp.json().get("results") or [] if r.get("component") == "PRIMARY_AREA"), {})

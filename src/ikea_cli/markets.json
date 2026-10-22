@@ -31,7 +31,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "at": {
    "name": "Austria",
@@ -64,6 +69,11 @@
    "auth": {
     "domain": "at.accounts.ikea.com",
     "client_id": "Fc6HpQgElMRb90uqwmwPXbQE2h5ueA6i"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "au": {
@@ -88,6 +98,11 @@
    "auth": {
     "domain": "au.accounts.ikea.com",
     "client_id": "HXUSz2Yppi5snAqTk9ikVOP5s7WdabJR"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "be": {
@@ -130,6 +145,11 @@
    "auth": {
     "domain": "be.accounts.ikea.com",
     "client_id": "2mcBkBabm2yxhakaKlrteT0Zs2ZcSNLa"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "bh": {
@@ -162,7 +182,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "ca": {
    "name": "Canada",
@@ -194,6 +219,11 @@
    "auth": {
     "domain": "ca.accounts.ikea.com",
     "client_id": "jUflsyuJkwbC0RQg1i8bgo1dyld6NM5d"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "ch": {
@@ -245,6 +275,11 @@
    "auth": {
     "domain": "ch.accounts.ikea.com",
     "client_id": "bs5g5nRzaloE8XlV2UrLC1Vx0r4Y0tpU"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "cl": {
@@ -266,7 +301,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "co": {
    "name": "Colombia",
@@ -287,7 +327,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "cz": {
    "name": "Czechia",
@@ -320,6 +365,11 @@
    "auth": {
     "domain": "cz.accounts.ikea.com",
     "client_id": "xWyvXOrWbledSIQozohFJifwBy1wWchp"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "de": {
@@ -353,6 +403,11 @@
    "auth": {
     "domain": "de.accounts.ikea.com",
     "client_id": "po7A70WYX6DeSRiKRKBJocsCxZHLyUUq"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "dk": {
@@ -378,6 +433,11 @@
    "auth": {
     "domain": "dk.accounts.ikea.com",
     "client_id": "LUSrk5e6FJ01XGDNuKi1rRg58qBQvhUu"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "ee": {
@@ -418,7 +478,12 @@
      "decimal": ","
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "eg": {
    "name": "Egypt",
@@ -448,7 +513,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "es": {
    "name": "Spain",
@@ -506,6 +576,11 @@
    "auth": {
     "domain": "es.accounts.ikea.com",
     "client_id": "dpnp2umABISPNJvm28dZ2gJQzXNhQs3m"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "fi": {
@@ -547,6 +622,11 @@
    "auth": {
     "domain": "fi.accounts.ikea.com",
     "client_id": "2G9e0d3JM8v4vBmDGBOozj7fnv8wT3le"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "fr": {
@@ -571,6 +651,11 @@
    "auth": {
     "domain": "fr.accounts.ikea.com",
     "client_id": "IhBz7Kf2VtAKXadfMJA13pmXrEES0JSt"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "gb": {
@@ -599,6 +684,11 @@
    "auth": {
     "domain": "gb.accounts.ikea.com",
     "client_id": "gqzXNCUVxgtykE7iLmA8VLJtz5MbRFh0"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "hr": {
@@ -624,6 +714,11 @@
    "auth": {
     "domain": "hr.accounts.ikea.com",
     "client_id": "4m02yxRb74ln1HGl9fsVMDYsvUOPXb8P"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "hu": {
@@ -649,6 +744,11 @@
    "auth": {
     "domain": "hu.accounts.ikea.com",
     "client_id": "z5gJWWARn9Imbwg0a44tPQ4P0w18bLc2"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "ie": {
@@ -674,6 +774,11 @@
    "auth": {
     "domain": "ie.accounts.ikea.com",
     "client_id": "sa3xnsi140oH8M2QavGN26n5BLF1lWkr"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "il": {
@@ -697,7 +802,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "in": {
    "name": "India",
@@ -721,6 +831,11 @@
    "auth": {
     "domain": "in.accounts.ikea.com",
     "client_id": "PxVvHZuJapEjzOsDXYaxNXr5m5r2ZQ5s"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "it": {
@@ -746,6 +861,11 @@
    "auth": {
     "domain": "it.accounts.ikea.com",
     "client_id": "TfgQrqkcNv8cSG3QJLXuUGD27vAUMzeI"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "jo": {
@@ -776,7 +896,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "jp": {
    "name": "Japan",
@@ -809,6 +934,11 @@
    "auth": {
     "domain": "jp.accounts.ikea.com",
     "client_id": "venUm2uZEvyo2u5SCVdmPdT31BVc3G00"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "kr": {
@@ -842,6 +972,11 @@
    "auth": {
     "domain": "kr.accounts.ikea.com",
     "client_id": "m5HVZNyFI10O49sogQQb2UIUsySsGV29"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "kw": {
@@ -872,7 +1007,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "lt": {
    "name": "Lithuania",
@@ -911,7 +1051,12 @@
      "decimal": ","
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "lv": {
    "name": "Latvia",
@@ -951,7 +1096,12 @@
      "decimal": ","
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "ma": {
    "name": "Morocco",
@@ -992,7 +1142,12 @@
      "decimal": ","
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "mx": {
    "name": "Mexico",
@@ -1023,7 +1178,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "my": {
    "name": "Malaysia",
@@ -1054,7 +1214,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "nl": {
    "name": "Netherlands",
@@ -1087,6 +1252,11 @@
    "auth": {
     "domain": "nl.accounts.ikea.com",
     "client_id": "nHmIKICLhYSdRSVIDt4kWhGVm3jINalt"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "no": {
@@ -1120,6 +1290,11 @@
    "auth": {
     "domain": "no.accounts.ikea.com",
     "client_id": "l38O2VaAd4oPPnS2SRpvp3YsfORjCOq0"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "nz": {
@@ -1144,6 +1319,11 @@
    "auth": {
     "domain": "nz.accounts.ikea.com",
     "client_id": "4Jq0lpZBKkop5s3AWyH6rxDgIhYaDjn4"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "om": {
@@ -1174,7 +1354,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "ph": {
    "name": "Philippines",
@@ -1195,7 +1380,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "pl": {
    "name": "Poland",
@@ -1220,6 +1410,11 @@
    "auth": {
     "domain": "pl.accounts.ikea.com",
     "client_id": "f2LIjaqFXyKIqZG4LomjnpmJZOENncsc"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "pt": {
@@ -1252,6 +1447,11 @@
    "auth": {
     "domain": "pt.accounts.ikea.com",
     "client_id": "g20uhfVhIwWFyJdyDI9TJ9tUGhQn0ijd"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "qa": {
@@ -1283,7 +1483,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "ro": {
    "name": "Romania",
@@ -1308,6 +1513,11 @@
    "auth": {
     "domain": "ro.accounts.ikea.com",
     "client_id": "fWLRPoIU4eNA8tHmAX7ENVGmoscdikao"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "rs": {
@@ -1333,6 +1543,11 @@
    "auth": {
     "domain": "rs.accounts.ikea.com",
     "client_id": "6HE38Cw6EXUgb5mNFwfYU0rtA8eYQikf"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "sa": {
@@ -1363,7 +1578,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "se": {
    "name": "Sweden",
@@ -1396,6 +1616,11 @@
    "auth": {
     "domain": "se.accounts.ikea.com",
     "client_id": "PnoYxSpbEzktCnCV28q0L9slqW7879ln"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "sg": {
@@ -1418,7 +1643,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "si": {
    "name": "Slovenia",
@@ -1445,6 +1675,11 @@
    "auth": {
     "domain": "si.accounts.ikea.com",
     "client_id": "2g9yJS5LJ8fFuatkL7gtO9MqjA2Oc6fc"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "sk": {
@@ -1470,6 +1705,11 @@
    "auth": {
     "domain": "sk.accounts.ikea.com",
     "client_id": "f5BC6ApS5eb1secKnXNOqNAr1vZfiFD5"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   },
   "th": {
@@ -1500,7 +1740,12 @@
      "decimal": "."
     }
    },
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "ua": {
    "name": "Ukraine",
@@ -1514,7 +1759,12 @@
    "default_language": "uk",
    "currency": null,
    "price_format": {},
-   "auth": null
+   "auth": null,
+   "features": {
+    "cart": false,
+    "lists": false,
+    "delivery": false
+   }
   },
   "us": {
    "name": "United States",
@@ -1547,6 +1797,11 @@
    "auth": {
     "domain": "us.accounts.ikea.com",
     "client_id": "ADzEosFiFb9v9HujH78E5kV2267U1vN4"
+   },
+   "features": {
+    "cart": true,
+    "lists": true,
+    "delivery": true
    }
   }
  },

@@ -11,6 +11,8 @@ Works in every IKEA country that shares the www.ikea.com platform, not only Cana
 - Login uses each market's own IKEA accounts site and public client id. Markets whose website signs in another way say so; their guest features still work.
 - Prices are written the way IKEA writes them in the market and language (`$1,299.00`, `1 299,00 $`, `¥12,990`, `CHF 3'540.25`).
 - Delivery works in markets where IKEA has no postal-code lookup; the postal code is passed on as given.
+- Markets where IKEA runs the cart, favourites, delivery check or sign-in on another system say so up front (exit 5, `not_available`; `ikea markets` lists what isn't available) instead of failing with HTTP 401.
+- A new exit-5 error code `not_available` and config error codes `market_not_set` and `unsupported_market` (exit 7).
 - Store regions drop the country prefix for every market (`GBABE` -> `ABE`).
 - Examples, help text and test data no longer refer to real places.
 - Live tests and `scripts/live-smoke.sh` take a market and pick products, a store and a postal code from IKEA's data for it.
