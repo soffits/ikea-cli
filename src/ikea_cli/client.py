@@ -4,9 +4,9 @@ Example::
 
     from ikea_cli import IkeaClient
 
-    with IkeaClient() as ikea:
+    with IkeaClient(Settings(country="us")) as ikea:
         results = ikea.search("kallax", limit=5)
-        stock = ikea.stock(["20275814"], store="149")
+        stock = ikea.stock(["20275814"], store="<store-id>")
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ from .config import (
     read_private_json,
     write_private_json,
 )
-from .errors import ApiError, IkeaError, NotFound, SessionExpired, UsageError
+from .errors import ApiError, IkeaError, NotAvailable, NotFound, SessionExpired, UsageError
 from .transport import Transport, new_request_id
 
 SEARCH_VERSION = "20260727"
@@ -87,6 +87,7 @@ class IkeaClient:
     ) -> None:
         self.paths = paths or Paths.default()
         self.settings = settings or load_settings(self.paths)
+        self.market = self.settings.market()  # fails early, with a clear message, if no usable market is set
         self.transport = Transport(http)
         self.auth = Auth(self.settings, self.paths, self.transport, access_token=access_token)
         self.force_guest = guest
@@ -104,11 +105,31 @@ class IkeaClient:
 
     @property
     def cc(self) -> str:
-        return self.settings.country
+        return self.market.country
 
     @property
     def lang(self) -> str:
-        return self.settings.language
+        return self.settings.language or self.market.default_language
+
+    def require(self, feature: str, what: str) -> None:
+        """Fail early, and clearly, when IKEA's shared service for this feature does not serve the market."""
+
+        if not self.market.offers(feature):
+            raise NotAvailable(
+                f"{what} is not available for IKEA {self.market.name} through ikea-cli: IKEA runs it on a different system there.",
+                hint="Search, product details, stores and stock still work. Use ikea.com for this.",
+            )
+
+    def format_price(self, value: Any, currency: str | None = None) -> str:
+        """Write a price the way IKEA does in this market and language, e.g. '$1,299.00' or '1 299,00 €'."""
+
+        try:
+            amount = float(value)
+        except (TypeError, ValueError):
+            return "-" if value is None else str(value)
+        if currency and self.market.currency and currency != self.market.currency:
+            return f"{amount:,.2f} {currency}"
+        return self.market.price_format(self.lang).format(amount, currency or self.market.currency)
 
     # ======================================================================= authenticated requests
 
@@ -308,7 +329,7 @@ class IkeaClient:
         data = self.transport.json(
             "GET", f"https://www.ikea.com/{self.cc}/{self.lang}/meta-data/informera/stores-detailed.json", what="IKEA stores"
         )
-        stores = [normalize.store(s) for s in data or [] if isinstance(s, dict) and not s.get("hideStore")]
+        stores = [normalize.store(s, self.cc) for s in data or [] if isinstance(s, dict) and not s.get("hideStore")]
         stores.sort(key=lambda s: str(s["name"]))
         write_private_json(cache_file, {"at": time.time(), "stores": stores})
         return stores
@@ -357,18 +378,34 @@ class IkeaClient:
     # ======================================================================= delivery
 
     def postal_lookup(self, postal_code: str) -> dict[str, Any]:
-        data = self.transport.json(
-            "POST",
-            "https://api.ingka.ikea.com/address/location",
-            json_body={"postCode": postal_code, "country": self.cc, "language": self.lang},
-            headers={"x-client-id": LOCATION_CLIENT_ID, "content-type": "application/json"},
-            what="IKEA address lookup",
-        )
+        """Region (state, province, county) and city for a postal code.
+
+        IKEA's lookup does not cover every market; there the postal code is used as given and
+        region and city are None.
+        """
+
+        try:
+            data = self.transport.json(
+                "POST",
+                "https://api.ingka.ikea.com/address/location",
+                json_body={"postCode": postal_code, "country": self.cc, "language": self.lang},
+                headers={"x-client-id": LOCATION_CLIENT_ID, "content-type": "application/json"},
+                what="IKEA address lookup",
+            )
+        except ApiError as exc:
+            if exc.status == 400 and "not supported" in exc.message.lower():
+                return {"postal_code": postal_code, "province": None, "city": None, "checked": False}
+            raise
         matches = (data or {}).get("matches") or []
         if not matches:
             raise NotFound(f"IKEA does not recognise the postal code {postal_code!r}.")
         m = matches[0]
-        return {"postal_code": (data or {}).get("postCode") or postal_code, "province": m.get("stateCode"), "city": m.get("city")}
+        return {
+            "postal_code": (data or {}).get("postCode") or postal_code,
+            "province": m.get("stateCode"),
+            "city": m.get("city"),
+            "checked": True,
+        }
 
     def delivery(
         self,
@@ -380,9 +417,13 @@ class IkeaClient:
     ) -> dict[str, Any]:
         """Home delivery and click & collect options for a postal code (no checkout involved)."""
 
+        self.require("delivery", "The delivery check")
         postal_code = postal_code or self.settings.postal_code
         if not postal_code:
-            raise UsageError("A postal code is needed.", hint="Pass --postal-code or run `ikea config set postal_code 'A1A 1A1'`.")
+            raise UsageError(
+                "Delivery options depend on where you live, so a postal code is needed.",
+                hint="Pass --postal-code or run `ikea config set postal_code '<postal-code>'`.",
+            )
         store = store or self.settings.store
         lines: list[dict[str, Any]] = []
         if from_cart:
@@ -403,14 +444,32 @@ class IkeaClient:
         if not lines:
             raise UsageError("Nothing to check: give item numbers or use the cart.")
         loc = self.postal_lookup(postal_code)
-        data, _ = self._authed(
+        try:
+            data, _ = self._fulfilment(loc, lines, store)
+        except ApiError as exc:
+            if exc.status == 400 and "invalid_enum_value" in exc.message and '"country"' in exc.message:
+                raise NotAvailable(
+                    f"IKEA's delivery check is not available for IKEA {self.market.name}.",
+                    status=400,
+                    hint="Stock per store still works: `ikea stock ITEM`. See delivery options on ikea.com.",
+                ) from exc
+            raise
+        out = normalize.fulfilment(data or {})
+        out["postal_code"] = loc["postal_code"]
+        out["province"] = loc["province"]
+        out["city"] = loc["city"]
+        out["store_id"] = store
+        return out
+
+    def _fulfilment(self, loc: dict[str, Any], lines: list[dict[str, Any]], store: str | None) -> tuple[Any, bool]:
+        return self._authed(
             "POST",
             "https://web-api.ikea.com/cart-bff-cf/api/v2/fulfilment",
             shopper=True,
             json_body={
                 "address": {
                     "postalCode": loc["postal_code"],
-                    "stateCode": loc["province"],
+                    "stateCode": loc["province"] or "",
                     "storeId": store or "",
                     "country": self.cc,
                     "language": self.lang,
@@ -428,12 +487,6 @@ class IkeaClient:
             },
             what="IKEA delivery",
         )
-        out = normalize.fulfilment(data or {})
-        out["postal_code"] = loc["postal_code"]
-        out["province"] = loc["province"]
-        out["city"] = loc["city"]
-        out["store_id"] = store
-        return out
 
     # ======================================================================= cart
 
@@ -459,6 +512,7 @@ class IkeaClient:
         return out
 
     def _cart(self, method: str, path: str = "", **kwargs: Any) -> tuple[Any, bool]:
+        self.require("cart", "The shopping cart")
         headers = {"x-consumer-name": "Web Cart", "accept-language": self.lang, "accept": "*/*", "content-type": "application/json"}
         return self._authed(method, self._cart_base() + path, shopper=True, what="IKEA cart", headers=headers, **kwargs)
 
@@ -530,6 +584,7 @@ class IkeaClient:
     # ======================================================================= favourites
 
     def _favs(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
+        self.require("lists", "Favourites lists")
         base_vars = {"languageCode": self.lang, "storeId": self.settings.store, "zip": None}
         data, _ = self._authed(
             "POST",

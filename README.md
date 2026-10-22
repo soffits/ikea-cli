@@ -6,7 +6,7 @@ It works for people at a terminal and for scripts and AI agents: every command c
 
 > **Unofficial.** ikea-cli is an independent project. It is not made, endorsed or supported by IKEA or Inter IKEA Systems B.V. It uses the same web services your browser uses on ikea.com, which can change without notice. "IKEA" is a trademark of Inter IKEA Systems B.V.
 
-**Markets:** Canada (`ca`, English and French) is tested. Country and language are settings, so other markets may work for catalogue, stock and cart commands, but they are untested and login needs extra settings (see [Other markets](#other-markets)).
+**Markets:** every country whose IKEA shop lives at `www.ikea.com/<country>/<language>/` (about 50, from the United States and Germany to Japan and Saudi Arabia). `ikea markets` lists them. Countries with their own separate IKEA website (for example China, Türkiye or Greece) are not supported, and the tool says so. See [Markets](#markets) for what was checked where. Account features (login, your cart and lists, orders, points) have only been tested with a Canadian account.
 
 ## Install
 
@@ -29,10 +29,25 @@ This installs the `ikea` command. Check it with `ikea --version`.
 
 No account is needed to search, check stock or try the cart. Without a login, the cart and lists live in a guest session on this computer.
 
-```console
-$ ikea store set "north york"
-Default store: IKEA North York (149)
+First pick your country (and, where IKEA offers several, your language):
 
+```console
+$ ikea markets
+Code  Country               Languages           Currency  Not available                 Tested
+----  --------------------  ------------------  --------  ----------------------------  ----------
+au    Australia             en                  AUD       -                             2026-10-22
+at    Austria               de, en              EUR       -                             -
+bh    Bahrain               ar, en              BHD       login, cart, lists, delivery  -
+...
+$ ikea config set country de
+Set country = de
+$ ikea store set <store-id>          # a store id or a unique part of its name, from `ikea stores`
+Default store: IKEA <store name> (<store-id>)
+```
+
+The examples below were taken in Canada (English); other markets show their own currency, language and stores.
+
+```console
 $ ikea search desk --sort price-asc -n 3 -f colors=10139
 Item        Name               Description                                             Price  Rating
 ----------  -----------------  ----------------------------------------------------  -------  ----------
@@ -43,14 +58,14 @@ Item        Name               Description                                      
 
 $ ikea stock 304.499.08 106.232.20
 106.232.20  home delivery: in stock
-Store            Qty  Status        Restock           Location
----------------  ---  ------------  ----------------  --------
-IKEA North York    0  out of stock  40 on 2026-10-22  Rugs
+Store              Qty  Status        Restock           Location
+-----------------  ---  ------------  ----------------  --------
+IKEA <store name>    0  out of stock  40 on 2026-10-22  Rugs
 
 304.499.08  home delivery: in stock
-Store            Qty  Status    Restock  Location
----------------  ---  --------  -------  ---------------
-IKEA North York   81  in stock  -        Activity area 4
+Store              Qty  Status    Restock  Location
+-----------------  ---  --------  -------  ---------------
+IKEA <store name>   81  in stock  -        Activity area 4
 
 $ ikea cart add 304.499.08:2 106.232.20
 Added 3 item(s).
@@ -79,7 +94,7 @@ ikea auth login
 
 It prints these steps:
 
-1. Sign in at `https://www.ikea.com/ca/en/profile/login/` in your browser and tick **Keep me signed in**. Skip this if you are already signed in.
+1. Sign in at `https://www.ikea.com/<country>/<language>/profile/login/` in your browser (the command prints the right address for your market) and tick **Keep me signed in**. Skip this if you are already signed in.
 2. In the same browser, open the link that `ikea auth login` printed, with `view-source:` in front of it. In Safari, open the link normally and use **Develop › Show Page Source**.
 3. Select all (Ctrl+A or Cmd+A), copy, and paste into the terminal. The page is about 2 KB and contains a one-time code.
 
@@ -88,7 +103,7 @@ ikea-cli then swaps the code for its own tokens. Access tokens last 24 hours and
 ```console
 $ ikea auth status
 Logged in as  Alex
-Market        CA
+Market        Canada (ca)
 Loyalty       FAMILYCA
 Access token  valid for 23 h 41 min
 Auto-refresh  yes
@@ -101,8 +116,10 @@ Other ways to log in:
 | --- | --- |
 | Two-step login, for scripts or agents | `ikea auth login --start` prints the link, then `ikea auth login --finish -` reads the pasted page from stdin. |
 | You prefer to copy the ikea.com address (experimental) | `ikea auth login --redirect`: sign in through the link, then copy the `https://www.ikea.com/…/profile/login/#code=…` address. The IKEA page moves on quickly; the address is still in your browser history. This variant has not been tested end to end yet; use the default flow if it fails. |
-| A server with no browser | Copy the `auth0` cookie for `ca.accounts.ikea.com` from your browser's developer tools (Application/Storage › Cookies), then run `ikea auth import --cookie -` and paste it. The cookie is used once and not stored. |
+| A server with no browser | Copy the `auth0` cookie for your market's accounts site (`<country>.accounts.ikea.com`) from your browser's developer tools (Application/Storage › Cookies), then run `ikea auth import --cookie -` and paste it. The cookie is used once and not stored. |
 | You already have an access token | `ikea auth import --access-token -` (valid for the rest of its 24 hours, cannot be renewed), or set `IKEA_ACCESS_TOKEN` for a single run. |
+
+Login works per market, with the market's own IKEA accounts site. In some markets the IKEA website signs in through a different system that ikea-cli can't use; there `ikea auth login` says so, and everything that works without an account still works.
 
 `ikea auth logout` revokes the refresh token at IKEA and deletes the local session. The guest session (guest cart and lists) is kept; add `--forget-guest` to drop it too. `ikea auth refresh` renews the access token on demand.
 
@@ -123,7 +140,7 @@ ikea search --category 10653              # browse a category
 ikea search white --category 10653        # search inside a category
 ikea suggest kal                          # search suggestions
 ikea product 106.232.20                   # price, rating, dimensions, packages, materials, variants
-ikea product https://www.ikea.com/ca/en/p/lagkapten-spaend-desk-white-s09563608/ --quick
+ikea product https://www.ikea.com/<country>/<language>/p/<product>-s09563608/ --quick
 ```
 
 Filter names and value ids come from `--filters`; they differ per search. The `f-` prefix IKEA uses is optional. `--filters` also lists the sort orders IKEA offers; `--sort` takes the short names (`price-asc`, `rating`, …) or any of those ids.
@@ -149,17 +166,17 @@ Choose size: 4 ' 4 "x6 ' 5 " [40623228], 5 ' 3 "x7 ' 7 " [10623220] *, 6 ' 7 "x9
 
 ```bash
 ikea stores                     # all stores; * marks your default
-ikea store set 149              # or a unique part of the name
+ikea store set <store-id>       # or a unique part of the name
 ikea store show                 # address and opening hours
 ikea stock 304.499.08           # your default store (or all stores if none is set)
 ikea stock 304.499.08 --all     # every store, with restock dates and aisle/bin locations
-ikea delivery 304.499.08:2 106.232.20 --postal-code "M5V 3L9"
+ikea delivery 304.499.08:2 106.232.20 --postal-code "<postal-code>"
 ikea delivery                   # uses the items in your cart
 ```
 
 ```console
-$ ikea delivery 30449908:2 10623220 --postal-code "M5V 3L9"
-Postal code M5V3L9 (Toronto, ON)
+$ ikea delivery 30449908:2 10623220 --postal-code "<postal-code>"
+Postal code <postal-code> (<city>, <region>)
 Home delivery:     $19.99, about 28 - 31 days
 Click & collect:   $5.00, about 1 - 2 days
 
@@ -169,7 +186,7 @@ Item        Delivery  Collect  In store  Restock
 106.232.20  yes       yes      no (0)    2026-10-22
 ```
 
-Delivery prices and dates are IKEA's estimates for the address; the final price is set at checkout.
+Delivery prices and dates are IKEA's estimates for the address; the final price is set at checkout. Only `delivery` needs a postal code. Where IKEA has no postal-code lookup for a country, the code is passed on as you typed it and city and region stay empty.
 
 ### Cart
 
@@ -187,7 +204,7 @@ ikea cart coupon remove CODE
 ikea cart clear --yes
 ```
 
-Totals in Canada are shown before tax, as on ikea.com.
+Totals are shown the way ikea.com shows them in your market: before tax in some (for example Canada and the United States), with tax in most others.
 
 ### Favourites lists
 
@@ -228,9 +245,9 @@ Add `--json` to any command (before or after the command name). Success prints `
 | 2 | bad command line or input | `usage` |
 | 3 | not logged in, session expired, or login failed | `auth_required`, `session_expired`, `login_failed` |
 | 4 | not found (item, store, list, order) | `not_found` |
-| 5 | IKEA rejected the request | `api_error` (with `status` and `details.codes`) |
+| 5 | IKEA rejected the request, or the feature isn't offered in this market | `api_error` (with `status` and `details.codes`), `not_available` |
 | 6 | network problem | `network` |
-| 7 | bad configuration | `config` |
+| 7 | bad configuration, no market chosen, or a market ikea-cli can't use | `config`, `market_not_set`, `unsupported_market` |
 
 Commands that would ask a question (`cart clear`, `lists delete`) need `--yes` when not run in a terminal. An agent skill describing the tool is in [`skills/ikea/SKILL.md`](skills/ikea/SKILL.md) and is also installed with the package.
 
@@ -239,49 +256,80 @@ Commands that would ask a question (`cart clear`, `lists delete`) need `--yes` w
 ```python
 from ikea_cli import IkeaClient
 
-with IkeaClient() as ikea:
+from ikea_cli import Settings
+
+with IkeaClient(Settings(country="de")) as ikea:  # or IkeaClient() to use your saved settings
     results = ikea.search("kallax", limit=5, sort="price-asc")
     for item in results["items"]:
-        print(item["item_no"], item["name"], item["price"])
+        print(item["item_no"], item["name"], ikea.format_price(item["price"]))
 
-    stock = ikea.stock(["30449908"], store="149")
+    stock = ikea.stock(["30449908"], store="<store-id>")
     cart = ikea.cart_add([("30449908", 2)])
 ```
 
-`IkeaClient` uses the same settings and session as the command. Methods return plain dictionaries (the same data as `--json`) and raise `ikea_cli.IkeaError` subclasses.
+`IkeaClient` uses the same settings and session as the command. It raises `MarketNotSet` when no country is configured and `UnsupportedMarket` for a country it can't serve. `ikea_cli.markets` has the market table. Methods return plain dictionaries (the same data as `--json`) and raise `ikea_cli.IkeaError` subclasses.
 
 ## Configuration
 
 ```bash
 ikea config show
-ikea config set postal_code "M5V 3L9"   # used for delivery and search context
-ikea config set language fr
+ikea config set country us              # your market (see `ikea markets`)
+ikea config set language es             # one of the market's languages
+ikea config set postal_code "<postal-code>"   # used for delivery and search context
 ikea config path                        # where files are kept
 ```
 
 | Setting | Meaning | Environment variable |
 | --- | --- | --- |
-| `country` | market, default `ca` | `IKEA_COUNTRY` |
-| `language` | language, default `en` | `IKEA_LANGUAGE` |
+| `country` | market (two-letter code from `ikea markets`); no default | `IKEA_COUNTRY` |
+| `language` | language; default: the market's main language | `IKEA_LANGUAGE` |
 | `store` | default store id | `IKEA_STORE` |
 | `postal_code` | default postal code | `IKEA_POSTAL_CODE` |
-| `auth_domain`, `auth_client_id` | login settings for markets other than Canada | |
+| `auth_domain`, `auth_client_id` | override the market's login settings (only needed if IKEA changes them before ikea-cli is updated) | |
 
-`--country` and `--language` override the settings for one command.
+`--country` and `--language` override the settings for one command. Changing the country drops the default store and postal code, which belong to one market. Settings from version 0.1 without a country keep working with Canada; the first run writes `country = ca` to the config and says so.
 
 ### Files
 
 Settings, session and cache follow your platform's conventions (on Linux: `~/.config/ikea-cli`, `~/.local/state/ikea-cli`, `~/.cache/ikea-cli`). Set `IKEA_CLI_HOME` to keep everything in one folder instead. Session files are written atomically with permissions `0600` in a `0700` folder. Logging in again or `ikea auth logout` replaces or removes them. Commands that renew the session take a lock first, so running several `ikea` commands at once is safe (on Windows the lock uses `msvcrt`; Windows is not covered by the automated tests yet).
 
-### Other markets
+## Markets
 
-Catalogue, stock, cart and lists use the country and language you set, for example `ikea --country us --language en search sofa`. These markets are untested and the CLI says so. Login needs the market's account domain and public client id, which you can find in the address of your browser's IKEA login page (`https://XX.accounts.ikea.com/authorize?client_id=…`):
+IKEA runs a separate shop per country, each with its own prices, stores, item range and account. ikea-cli works with the countries IKEA serves from `www.ikea.com/<country>/<language>/`:
 
 ```bash
-ikea config set country us
-ikea config set auth_domain us.accounts.ikea.com
-ikea config set auth_client_id CLIENT_ID_FROM_THE_ADDRESS
+ikea markets            # code, country, languages, currency, what isn't available, last live check
+ikea markets --all      # also the countries ikea-cli can't use
+ikea markets swe        # find a country by name
 ```
+
+What a market offers comes from IKEA itself. The table in `src/ikea_cli/markets.json` is generated by `scripts/update_markets.py` from IKEA's country picker, each market's login settings and a few read-only guest requests, so it can be refreshed when IKEA changes something.
+
+Not every feature exists everywhere:
+
+- Countries with their own IKEA website (for example China, Türkiye, Greece, Taiwan, Iceland, the Spanish islands) are not supported; choosing one gives a clear error.
+- In some markets (for example the United Arab Emirates, Saudi Arabia, Mexico or Singapore) IKEA runs the cart, favourites, delivery check and sign-in on a different system. There ikea-cli does search, product details, stores and stock, and says plainly that the rest isn't available.
+- Where IKEA has no postal-code lookup (for example South Korea), delivery still works; city and region are just left empty.
+
+Checked live with a guest session on 2026-10-22 (search, suggestions, categories, product details, stores, stock, delivery, guest cart, guest lists, and that IKEA's login service accepts the login link):
+
+| Market | Search, product, stores, stock | Delivery | Guest cart | Guest lists | Login link |
+| --- | --- | --- | --- | --- | --- |
+| Canada (`ca`, en and fr) | yes | yes | yes | yes | yes |
+| United States (`us/en`) | yes | yes | yes | yes | yes |
+| United Kingdom (`gb/en`) | yes | yes | yes | yes | yes |
+| Germany (`de/de`) | yes | yes | yes | yes | yes |
+| France (`fr/fr`) | yes | yes | yes | yes | yes |
+| Sweden (`se/sv`) | yes | yes | yes | yes | yes |
+| Spain (`es/es`) | yes | yes | yes | yes | yes |
+| Japan (`jp/ja`) | yes | yes | yes | yes | yes |
+| South Korea (`kr/ko`) | yes | yes (no postal-code lookup) | yes | yes | yes |
+| Australia (`au/en`) | yes | yes | yes | yes | yes |
+| United Arab Emirates (`ae/en`) | yes | not offered | not offered | not offered | not offered |
+
+The other markets in `ikea markets` use the same services and settings from the same generator, but were not run end to end.
+
+Account features (login, your cart and lists, orders, IKEA Family) have only been tested with a Canadian account; other markets use the same services with their own login settings.
 
 ## Troubleshooting
 

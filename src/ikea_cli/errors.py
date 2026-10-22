@@ -45,6 +45,18 @@ class ConfigError(IkeaError):
     exit_code = EXIT_CONFIG
 
 
+class MarketNotSet(ConfigError):
+    code = "market_not_set"
+
+    def __init__(self, message: str = "No IKEA market is set.", **kwargs: Any) -> None:
+        kwargs.setdefault("hint", "List markets with `ikea markets`, then run `ikea config set country CODE` (for example `us` or `de`).")
+        super().__init__(message, **kwargs)
+
+
+class UnsupportedMarket(ConfigError):
+    code = "unsupported_market"
+
+
 class AuthRequired(IkeaError):
     code = "auth_required"
     exit_code = EXIT_AUTH
@@ -87,6 +99,12 @@ class ApiError(IkeaError):
         if self.status is not None:
             out["status"] = self.status
         return out
+
+
+class NotAvailable(ApiError):
+    """IKEA does not offer this feature in the chosen market."""
+
+    code = "not_available"
 
 
 class NetworkError(IkeaError):

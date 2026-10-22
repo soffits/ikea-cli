@@ -13,7 +13,8 @@ from typing import Any
 
 import platformdirs
 
-from .errors import ConfigError
+from . import markets
+from .errors import ConfigError, MarketNotSet
 
 APP_NAME = "ikea-cli"
 
@@ -36,64 +37,82 @@ class AuthMarket:
     scope: str = "openid profile email offline_access"
 
 
-# Markets whose login has been checked. Other markets can be configured with
-# `auth_domain` and `auth_client_id` in the config file.
-KNOWN_AUTH: dict[str, AuthMarket] = {
-    "ca": AuthMarket(domain="ca.accounts.ikea.com", client_id="jUflsyuJkwbC0RQg1i8bgo1dyld6NM5d"),
-}
-
-VERIFIED_MARKETS = {("ca", "en"), ("ca", "fr")}
-
 _CODE_RE = re.compile(r"^[a-z]{2}$")
 _STORE_RE = re.compile(r"^[0-9]{3,5}$")
 
 
 @dataclass
 class Settings:
-    country: str = "ca"
-    language: str = "en"
+    """Where and how to talk to IKEA.
+
+    ``country`` has no default: IKEA runs a separate shop per country, so it must be chosen
+    (see ``ikea markets``). ``language`` defaults to the market's main language.
+    """
+
+    country: str | None = None
+    language: str | None = None
     store: str | None = None
     postal_code: str | None = None
     auth_domain: str | None = None
     auth_client_id: str | None = None
     extra: dict[str, Any] = field(default_factory=dict, repr=False)
+    # True when no country was configured and the 0.1 default (Canada) was applied for an existing setup.
+    implicit_country: bool = field(default=False, repr=False)
 
     def __post_init__(self) -> None:
-        self.country = self.country.lower()
-        self.language = self.language.lower()
-        if not _CODE_RE.match(self.country):
-            raise ConfigError(f"Invalid country code {self.country!r}; use a two-letter code such as 'ca'.")
-        if not _CODE_RE.match(self.language):
-            raise ConfigError(f"Invalid language code {self.language!r}; use a two-letter code such as 'en'.")
+        if self.country is not None:
+            self.country = str(self.country).strip().lower()
+            if not _CODE_RE.match(self.country):
+                raise ConfigError(f"Invalid country code {self.country!r}; use a two-letter code such as 'us' or 'de'.")
+        if self.language is not None:
+            self.language = str(self.language).strip().lower()
+            if not _CODE_RE.match(self.language):
+                raise ConfigError(f"Invalid language code {self.language!r}; use a two-letter code such as 'en'.")
+        elif self.country:
+            market = markets.get(self.country)
+            if market is not None:
+                self.language = market.default_language
         if self.store is not None:
             self.store = str(self.store)
             if not _STORE_RE.match(self.store):
-                raise ConfigError(f"Invalid store id {self.store!r}; store ids are numbers such as '149'.")
+                raise ConfigError(f"Invalid store id {self.store!r}; store ids are numbers (see `ikea stores`).")
         if self.postal_code:
             self.postal_code = normalize_postal_code(self.postal_code)
 
+    def market(self) -> markets.Market:
+        """The configured market. Raises if none is set, or if ikea-cli cannot serve it."""
+
+        if not self.country:
+            raise MarketNotSet()
+        market, language = markets.resolve(self.country, self.language)
+        self.language = language
+        return market
+
     @property
     def locale(self) -> str:
-        return f"{self.language}-{self.country.upper()}"
+        return f"{self.language or 'en'}-{(self.country or '').upper()}"
 
     @property
     def verified(self) -> bool:
-        return (self.country, self.language) in VERIFIED_MARKETS
+        market = markets.get(self.country)
+        return bool(market and market.tested and self.language in market.languages)
 
     def auth_market(self) -> AuthMarket:
-        known = KNOWN_AUTH.get(self.country)
-        domain = self.auth_domain or (known.domain if known else None)
-        client_id = self.auth_client_id or (known.client_id if known else None)
+        market = self.market()
+        domain = self.auth_domain or market.auth_domain
+        client_id = self.auth_client_id or market.auth_client_id
         if not domain or not client_id:
             raise ConfigError(
-                f"Login is not configured for market {self.country!r}.",
-                hint="Set auth_domain and auth_client_id with `ikea config set` (see the README).",
+                f"Logging in from ikea-cli is not available for IKEA {market.name}: its website signs in a different way.",
+                hint="Search, stock, delivery and the guest cart and lists still work. If you know the market's Auth0 "
+                "settings, set auth_domain and auth_client_id with `ikea config set`.",
             )
         return AuthMarket(domain=domain, client_id=client_id)
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)
         data.pop("extra")
+        data.pop("implicit_country")
         return data
 
 
@@ -154,10 +173,29 @@ def load_settings(paths: Paths, overrides: dict[str, Any] | None = None) -> Sett
     for key, value in (overrides or {}).items():
         if value is not None:
             data[key] = value
-    known = {f.name for f in fields(Settings)} - {"extra"}
+    implicit = False
+    if not data.get("country") and _used_before_markets(paths):
+        # ikea-cli 0.1 only served Canada and did not store the country; keep existing setups working.
+        data["country"] = LEGACY_COUNTRY
+        implicit = True
+    known = {f.name for f in fields(Settings)} - {"extra", "implicit_country"}
     kwargs = {k: v for k, v in data.items() if k in known}
     extra = {k: v for k, v in data.items() if k not in known}
-    return Settings(**kwargs, extra=extra)
+    return Settings(**kwargs, extra=extra, implicit_country=implicit)
+
+
+LEGACY_COUNTRY = "ca"
+
+
+def _used_before_markets(paths: Paths) -> bool:
+    """True if this computer has settings or sessions from a version that always used Canada."""
+
+    if paths.config_file.exists():
+        return True
+    if (paths.state_dir / f"session-{LEGACY_COUNTRY}.json").exists():
+        return True
+    guest = read_private_json(paths.guest_file)
+    return isinstance(guest, dict) and guest.get("country") == LEGACY_COUNTRY
 
 
 def save_config(paths: Paths, values: dict[str, Any]) -> None:

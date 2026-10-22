@@ -6,7 +6,7 @@ import stat
 
 import pytest
 
-from ikea_cli import normalize
+from ikea_cli import markets, normalize
 from ikea_cli.config import Paths, Settings, load_settings, save_config, write_private_json
 from ikea_cli.errors import ConfigError, UsageError
 
@@ -17,13 +17,14 @@ def test_paths_follow_ikea_cli_home(isolated_env):
     assert paths.state_dir == isolated_env / "state"
 
 
-def test_settings_validation():
-    s = Settings(country="CA", language="EN", store=149, postal_code=" m5v   3l9 ")
-    assert (s.country, s.language, s.store, s.postal_code) == ("ca", "en", "149", "M5V 3L9")
+def test_settings_validation(monkeypatch):
+    monkeypatch.setattr(markets, "TESTED", {"ca": "2026-01-01"})
+    s = Settings(country="CA", language="EN", store=101, postal_code=" zz9   9zz ")
+    assert (s.country, s.language, s.store, s.postal_code) == ("ca", "en", "101", "ZZ9 9ZZ")
     assert s.locale == "en-CA"
     assert s.verified
     assert not Settings(country="us", language="en").verified
-    for bad in ({"country": "canada"}, {"language": "e"}, {"store": "north york"}):
+    for bad in ({"country": "canada"}, {"language": "e"}, {"store": "testville"}):
         with pytest.raises(ConfigError):
             Settings(**bad)
 

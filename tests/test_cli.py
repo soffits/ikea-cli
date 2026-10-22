@@ -8,7 +8,7 @@ import httpx
 import pytest
 from conftest import access_token, add_guest, load_fixture
 
-from ikea_cli import auth, cli
+from ikea_cli import auth, cli, markets
 from ikea_cli.client import IkeaClient
 from ikea_cli.config import Paths
 from ikea_cli.errors import EXIT_API, EXIT_AUTH, EXIT_NOT_FOUND, EXIT_USAGE, UsageError
@@ -226,13 +226,13 @@ def _page_for(request: httpx.Request) -> str:
 
 def test_config_set_show_unset(run, router):
     router.add("GET", STORES, load_fixture("stores.json"))
-    assert run("config", "set", "postal_code", "a1a 1a1")[0] == 0
+    assert run("config", "set", "postal_code", "zz9 9zz")[0] == 0
     assert run("store", "set", "testville")[0] == 0
     code, out, _ = run("--json", "config", "show")
     data = json.loads(out)["data"]
-    assert data["postal_code"] == "A1A 1A1"
+    assert data["postal_code"] == "ZZ9 9ZZ"
     assert data["store"] == "101"
-    assert data["verified_market"] is True
+    assert data["verified_market"] is bool(markets.get("ca").tested)
     code, _, _err = run("config", "set", "country", "canada")
     assert code != 0
     assert run("config", "unset", "store")[0] == 0
@@ -258,10 +258,13 @@ def test_stock_uses_default_store(run, router):
 
 
 def test_unverified_market_note(run, router):
-    router.add("POST", "https://sik.search.blue.cdtapps.com/se/sv/search", load_fixture("search.json"))
-    code, _, err = run("--country", "se", "--language", "sv", "search", "bord")
+    router.add("POST", "https://sik.search.blue.cdtapps.com/it/it/search", load_fixture("search.json"))
+    code, _, err = run("--country", "it", "search", "bord")
     assert code == 0
     assert "has not been tested" in err
+    router.add("POST", "https://sik.search.blue.cdtapps.com/se/sv/search", load_fixture("search.json"))
+    _, _, err = run("--country", "se", "search", "bord")
+    assert "has not been tested" not in err
 
 
 @pytest.mark.parametrize(

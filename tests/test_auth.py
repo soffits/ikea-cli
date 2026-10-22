@@ -25,7 +25,7 @@ REVOKE_URL = "https://ca.accounts.ikea.com/oauth/revoke"
 
 def make_auth(router: Router, **kwargs) -> auth.Auth:
     transport = Transport(httpx.Client(transport=httpx.MockTransport(router)))
-    return auth.Auth(Settings(), Paths.default(), transport, **kwargs)
+    return auth.Auth(Settings(country="ca"), Paths.default(), transport, **kwargs)
 
 
 # --------------------------------------------------------------------------- PKCE and URLs
@@ -40,7 +40,7 @@ def test_pkce_challenge_matches_verifier():
 
 @pytest.mark.parametrize(("mode", "response_mode", "prompt"), [("page", "web_message", "none"), ("redirect", "fragment", None)])
 def test_authorize_url(mode, response_mode, prompt):
-    url = auth.authorize_url(Settings(), "CHALLENGE", "STATE", mode=mode)
+    url = auth.authorize_url(Settings(country="ca"), "CHALLENGE", "STATE", mode=mode)
     parts = urlsplit(url)
     q = {k: v[0] for k, v in parse_qs(parts.query).items()}
     assert parts.netloc == "ca.accounts.ikea.com"
@@ -56,14 +56,15 @@ def test_authorize_url(mode, response_mode, prompt):
 
 def test_authorize_url_rejects_unknown_mode():
     with pytest.raises(UsageError):
-        auth.authorize_url(Settings(), "c", "s", mode="popup")
+        auth.authorize_url(Settings(country="ca"), "c", "s", mode="popup")
 
 
 def test_unconfigured_market_needs_auth_settings():
     with pytest.raises(ConfigError):
-        Settings(country="se", language="sv").auth_market()
-    market = Settings(country="se", language="sv", auth_domain="se.accounts.example", auth_client_id="abc").auth_market()
-    assert market.domain == "se.accounts.example"
+        Settings(country="ae", language="en").auth_market()  # its website signs in without a public client id
+    market = Settings(country="ae", language="en", auth_domain="ae.accounts.example", auth_client_id="abc").auth_market()
+    assert market.domain == "ae.accounts.example"
+    assert Settings(country="se").auth_market().domain == "se.accounts.ikea.com"
 
 
 # --------------------------------------------------------------------------- pasted input

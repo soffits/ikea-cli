@@ -9,6 +9,8 @@ import unicodedata
 from collections.abc import Sequence
 from typing import Any, TextIO
 
+from .markets import PriceFormat
+
 
 def envelope_ok(data: Any) -> dict[str, Any]:
     return {"ok": True, "data": data}
@@ -80,16 +82,18 @@ def table(rows: Sequence[Sequence[Any]], headers: Sequence[str], *, align_right:
     return "\n".join(lines)
 
 
-def money(value: Any, currency: str | None = None) -> str:
+def money(value: Any, currency: str | None = None, fmt: PriceFormat | None = None) -> str:
+    """Format a price. With ``fmt`` (the market's price format) it looks like prices on ikea.com."""
+
     if value is None:
         return "-"
     try:
         amount = float(value)
     except (TypeError, ValueError):
         return str(value)
-    if currency in (None, "CAD", "USD", "AUD"):
-        return f"${amount:,.2f}"
-    return f"{amount:,.2f} {currency}"
+    if fmt is not None:
+        return fmt.format(amount, currency)
+    return f"{amount:,.2f} {currency}" if currency else f"{amount:,.2f}"
 
 
 def kv(pairs: Sequence[tuple[str, Any]]) -> str:

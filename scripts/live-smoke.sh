@@ -1,17 +1,25 @@
 #!/usr/bin/env bash
-# Run every ikea command once against the real IKEA website (Canada), as a guest.
+# Run every ikea command once against the real IKEA website, as a guest, in one market.
 # Account commands run read-only only if IKEA_ACCESS_TOKEN is set; nothing in the account is changed.
 #
-#   scripts/live-smoke.sh            # guest only
-#   IKEA_ACCESS_TOKEN=... scripts/live-smoke.sh
+#   scripts/live-smoke.sh                 # Canada, English
+#   scripts/live-smoke.sh de/de           # any market from `ikea markets`
+#   IKEA_ACCESS_TOKEN=... scripts/live-smoke.sh us/en
 #
+# Products, a store and a postal code are picked from IKEA's own data for that market
+# (a search, the store list, and that store's postal code). Override with IKEA_SMOKE_STORE
+# and IKEA_SMOKE_POSTAL_CODE.
 # Uses a throwaway IKEA_CLI_HOME so your own settings and session are untouched.
 set -u
 cd "$(dirname "$0")/.."
+market="${1:-ca/en}"
+country="${market%%/*}"
+language="${market#*/}"
+[ "$language" = "$market" ] && language=""
 export IKEA_CLI_HOME="$(mktemp -d)"
 trap 'rm -rf "$IKEA_CLI_HOME"' EXIT
 account_token="${IKEA_ACCESS_TOKEN:-}"
-unset IKEA_ACCESS_TOKEN
+unset IKEA_ACCESS_TOKEN IKEA_COUNTRY IKEA_LANGUAGE IKEA_STORE IKEA_POSTAL_CODE
 
 pass=0
 fail=0
@@ -28,52 +36,109 @@ run() {
   fi
   sleep 0.5
 }
+# Like run 0, but a feature IKEA doesn't offer in this market (error.code not_available) counts as "n/a".
+na=0
+run_or_na() {
+  local out code
+  out="$(uv run --quiet ikea --json "$@" 2>/dev/null)"
+  code=$?
+  if [ "$code" = 0 ]; then
+    pass=$((pass + 1)); printf 'ok    %-45s exit 0\n' "$*"
+  elif printf '%s' "$out" | grep -q '"not_available"'; then
+    na=$((na + 1)); printf 'n/a   %-45s not offered in this market\n' "$*"
+  else
+    fail=$((fail + 1)); printf 'FAIL  %-45s exit %s (want 0)\n' "$*" "$code"
+    printf '%s\n' "$out" | head -c 400; echo
+  fi
+  sleep 0.5
+}
+q() { uv run --quiet ikea --json "$@" 2>/dev/null; }
+pick() { python3 -c "import json,sys; d=json.load(sys.stdin).get('data'); print($1)" 2>/dev/null; }
 
-LACK=30449908
-RUG=10623220
-
+echo "market: $market"
+run 7 search LACK                          # no market chosen yet: told to pick one
+run 0 markets
+run 0 config set country "$country"
+[ -n "$language" ] && run 0 config set language "$language"
 run 0 config show
 run 0 config path
-run 0 config set postal_code "M5V 3L9"
+
+# Sample data from IKEA itself.
+items="$(q search LACK -n 20 | pick "' '.join(i['item_no'] for i in d['items'] if i['item_type']=='ART' and i['price'] and i['online_sellable'] is not False)")"
+[ -z "$items" ] && items="$(q search KALLAX -n 20 | pick "' '.join(i['item_no'] for i in d['items'] if i['item_type']=='ART' and i['price'] and i['online_sellable'] is not False)")"
+A="$(echo "$items" | cut -d' ' -f1)"
+B="$(echo "$items" | cut -d' ' -f2)"
+[ -z "$B" ] && B="$A"
+url="$(q search LACK -n 1 | pick "d['items'][0]['url']")"
+store="${IKEA_SMOKE_STORE:-$(q stores | pick "next((s['id'] for s in d if 'STORE' in str(s.get('kind') or '').upper() and s.get('postal_code')), d[0]['id'])")}"
+postal="${IKEA_SMOKE_POSTAL_CODE:-$(q stores | pick "next((s.get('postal_code') or '' for s in d if s['id']=='$store'), '')")}"
+category="$(q categories | pick "d[0]['id']")"
+feature() { uv run --quiet python -c "from ikea_cli import markets; m=markets.get('$country'); print('yes' if m.offers('$1') else 'no')"; }
+has_cart="$(feature cart)"; has_lists="$(feature lists)"; has_delivery="$(feature delivery)"
+skip() { na=$((na + 1)); printf 'n/a   %-45s not offered in this market\n' "$*"; }
+echo "cart: $has_cart  lists: $has_lists  delivery: $has_delivery"
+echo "items: $A $B  store: $store  postal code: ${postal:-(none)}  category: $category"
+
 run 0 stores
-run 0 store set 149
+run 0 store set "$store"
 run 0 store show
-run 0 search desk -n 3 --sort price-asc
-run 0 search desk -n 3 -f colors=10139 -f new-product
-run 0 search desk --filters
-run 0 search --category 10653 -n 3
-run 0 search white --category 10653 -n 3
-run 0 search desk --sort MOST_POPULAR -n 3
+[ -n "$postal" ] && run 0 config set postal_code "$postal"
+run 0 search LACK -n 3 --sort price-asc
+run 0 search LACK --filters
+run 0 search --category "$category" -n 3
+run 0 search LACK --sort MOST_POPULAR -n 3
 run 0 suggest kal
-run 0 categories rug
-run 0 product "$LACK"
-run 0 product https://www.ikea.com/ca/en/p/lagkapten-spaend-desk-white-s09563608/ --quick
+run 0 categories
+run 0 product "$A"
+[ -n "$url" ] && run 0 product "$url" --quick
 run 4 product 00000001
-run 0 stock "$LACK" "$RUG"
-run 0 stock "$LACK" --all
-run 0 delivery "$LACK:2" "$RUG"
+run 0 stock "$A" "$B"
+run 0 stock "$A" --all
+if [ "$has_delivery" = no ]; then
+  run 5 delivery "$A:2" --postal-code 00000   # says it is not available here
+elif [ -n "$postal" ]; then
+  run_or_na delivery "$A:2" "$B"
+else
+  run 2 delivery "$A:2"                    # explains that a postal code is needed
+fi
 run 0 auth status
-run 0 cart show
-run 0 cart add "$LACK:2" "$RUG"
-run 0 cart set "$LACK:3"
-run 0 cart remove "$RUG"
-run 4 cart remove "$RUG"
-run 5 cart coupon add NOT-A-REAL-CODE
-run 0 delivery
-run 0 cart clear --yes
-run 0 lists
-run 0 lists create "smoke test"
-run 0 lists add "$LACK:2" --list "smoke test"
-run 0 lists set "$LACK:1" --list "smoke test"
-run 0 lists show "smoke test"
-run 0 lists rename "smoke test" "smoke test 2"
-run 0 lists select "smoke test 2"
-run 0 lists remove "$LACK" --list "smoke test 2"
-run 0 lists delete "smoke test 2" --yes
+if [ "$has_cart" = yes ]; then
+  run 0 cart show
+  run 0 cart add "$A:2" "$B"
+  run 0 cart set "$A:3"
+  if [ "$A" != "$B" ]; then
+    run 0 cart remove "$B"
+    run 4 cart remove "$B"
+  fi
+  run 5 cart coupon add NOT-A-REAL-CODE
+  [ -n "$postal" ] && run_or_na delivery
+  run 0 cart clear --yes
+else
+  run 5 cart show                         # says it is not available here
+  skip cart add/set/remove/coupon/clear
+fi
+if [ "$has_lists" = yes ]; then
+  run 0 lists
+  run 0 lists create "smoke test"
+  run 0 lists add "$A:2" --list "smoke test"
+  run 0 lists set "$A:1" --list "smoke test"
+  run 0 lists show "smoke test"
+  run 0 lists rename "smoke test" "smoke test 2"
+  run 0 lists select "smoke test 2"
+  run 0 lists remove "$A" --list "smoke test 2"
+  run 0 lists delete "smoke test 2" --yes
+else
+  run 5 lists                             # says it is not available here
+  skip lists create/add/set/show/rename/select/remove/delete
+fi
 run 3 orders
-run 0 auth login --start
+if [ "$(uv run --quiet python -c "from ikea_cli import markets; print(bool(markets.get('$country').auth_domain))")" = "True" ]; then
+  run 0 auth login --start
+else
+  run 7 auth login --start                 # login not offered for this market
+fi
 run 0 auth logout --local-only
-run 0 cart show
+[ "$has_cart" = yes ] && run 0 cart show
 
 if [ -n "$account_token" ]; then
   export IKEA_ACCESS_TOKEN="$account_token"
@@ -84,12 +149,12 @@ if [ -n "$account_token" ]; then
   run 0 loyalty
   run 0 rewards
   run 0 profile
-  first="$(uv run --quiet ikea --json orders -n 1 | python3 -c 'import json,sys; p=json.load(sys.stdin)["data"]["purchases"]; print(p[0]["id"] if p else "")')"
+  first="$(q orders -n 1 | pick "d['purchases'][0]['id'] if d['purchases'] else ''")"
   if [ -n "$first" ]; then
     run 0 orders show "$first"
     run 0 orders status "$first"
   fi
 fi
 
-echo "passed: $pass  failed: $fail"
+echo "$market passed: $pass  failed: $fail  not offered: $na"
 [ "$fail" = 0 ]

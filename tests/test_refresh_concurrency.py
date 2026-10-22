@@ -41,7 +41,7 @@ def _worker(home: str, state, lock, barrier) -> str:
         return httpx.Response(200, json={"access_token": access_token(expires_in=86400), "refresh_token": new, "expires_in": 86400})
 
     transport = Transport(httpx.Client(transport=httpx.MockTransport(token_server)))
-    a = auth.Auth(Settings(), _paths(home), transport)
+    a = auth.Auth(Settings(country="ca"), _paths(home), transport)
     barrier.wait(timeout=60)
     try:
         a.user_token()

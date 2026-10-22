@@ -1,6 +1,6 @@
 """Unofficial command-line client and Python library for the IKEA website."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .client import IkeaClient
 from .config import Settings
