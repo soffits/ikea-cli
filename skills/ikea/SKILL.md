@@ -5,10 +5,10 @@ description: Use the `ikea` command-line tool to search IKEA products, read prod
 
 # IKEA via `ikea`
 
-`ikea` is an unofficial CLI for the IKEA website (Canada tested; country/language are settings). Always pass `--json` and read the envelope:
+`ikea` is an unofficial CLI for the IKEA website. It works in the IKEA countries that share the www.ikea.com platform (`ikea --json markets`); each country is a separate shop with its own prices, stores and account. Always pass `--json` and read the envelope:
 
 - success: `{"ok": true, "data": ...}`, exit code 0
-- failure: `{"ok": false, "error": {"code", "message", "hint"?, "status"?, "details"?}}`, exit codes: 1 unexpected, 2 usage, 3 auth (`auth_required`, `session_expired`, `login_failed`), 4 not found, 5 IKEA rejected the request, 6 network, 7 config.
+- failure: `{"ok": false, "error": {"code", "message", "hint"?, "status"?, "details"?}}`, exit codes: 1 unexpected, 2 usage, 3 auth (`auth_required`, `session_expired`, `login_failed`), 4 not found, 5 IKEA rejected the request, 6 network, 7 config (`market_not_set`, `unsupported_market`, `config`).
 
 On an error, read `error.hint`; it says what to run next. Don't retry exit codes 2-5 unchanged.
 
@@ -19,7 +19,9 @@ ikea --json config show        # country, language, default store, postal code
 ikea --json auth status        # logged_in: true = cart/lists are the user's real account
 ```
 
-If the user has a preferred store or postal code, save it: `ikea store set "north york"`, `ikea config set postal_code "M5V 3L9"`.
+If `country` is null (`market_not_set`), ask the user which country they shop in, find it with `ikea --json markets QUERY` (data[]: country, name, languages, currency, login), then `ikea config set country CODE` (and `ikea config set language CODE` if they prefer another of its languages). `unsupported_market` means that country's IKEA runs a separate website this tool can't use; say so. For a single command in another country use `--country CODE [--language CODE]`.
+
+If the user has a preferred store or postal code, save it: `ikea store set <store-id or name>`, `ikea config set postal_code "<postal-code>"`. Postal codes are only needed for delivery.
 
 ## Item numbers
 
@@ -47,9 +49,9 @@ Filter ids differ per search; get them from `--filters` (drop the `f-` prefix or
 ```bash
 ikea --json stores
 ikea --json stock 30449908 10623220            # default store, or all stores if none set
-ikea --json stock 30449908 --store 149         # data[].stores[]: quantity, status, restocks[{earliest,latest,quantity}], locations[{department|aisle,bin}]
+ikea --json stock 30449908 --store <store-id>        # data[].stores[]: quantity, status, restocks[{earliest,latest,quantity}], locations[{department|aisle,bin}]
 ikea --json stock 30449908 --all
-ikea --json delivery 30449908:2 --postal-code "M5V 3L9" --store 149   # home_delivery.price/lead_time_days, click_and_collect, items[]
+ikea --json delivery 30449908:2 --postal-code "<postal-code>" --store <store-id>   # home_delivery.price/lead_time_days, click_and_collect, items[]
 ikea --json delivery                            # uses the cart contents
 ```
 
@@ -58,7 +60,7 @@ ikea --json delivery                            # uses the cart contents
 When logged in, cart commands change the user's **real** IKEA cart (same as ikea.com and the app). Confirm with the user before adding, changing or removing items they did not ask for. Not logged in, or with `--guest`, a guest cart stored on this machine is used (`data.guest: true`).
 
 ```bash
-ikea --json cart                                # items[], total (before tax in Canada), currency, discount_codes
+ikea --json cart                                # items[], total (before tax in some markets, e.g. CA and US), currency, discount_codes
 ikea --json cart add 30449908:2 10623220
 ikea --json cart add --file items.txt           # "item quantity" per line, or JSON [{"item_no","quantity"}]; "-" = stdin
 ikea --json cart set 30449908:4                 # exact quantity; 0 removes; item must already be in the cart
@@ -96,6 +98,7 @@ ikea --json profile
 Login needs the user, because IKEA's login form only works in a real browser. Never ask for their password.
 
 1. `ikea --json auth login --start` returns `data.instructions` and `data.url`. Show the instructions to the user: sign in on ikea.com, open `view-source:` + the URL in the same browser, copy the whole page.
+   Login is per market. Some markets sign in through a different system; then `auth login` fails with exit 7 and guest features still work.
 2. Pass what they paste to `ikea --json auth login --finish -` on stdin.
 3. On a server, the user can instead give the `auth0` cookie: `ikea --json auth import --cookie -` (stdin).
 
@@ -104,6 +107,6 @@ Sessions refresh automatically. `session_expired` (also returned when IKEA answe
 ## Limits
 
 - No checkout, payment, order changes or point redemption: send the user to ikea.com for those.
-- Prices in Canada are before tax. Delivery prices are estimates until checkout.
+- Item numbers and prices differ between countries; search in the user's market. Prices are before tax in some markets (e.g. CA, US). Delivery prices are estimates until checkout.
 - Keep request volume modest; don't loop over hundreds of items.
 - Never echo tokens, cookies or pasted login pages back to the user.
