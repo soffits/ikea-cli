@@ -111,6 +111,15 @@ class IkeaClient:
     def lang(self) -> str:
         return self.settings.language or self.market.default_language
 
+    def require(self, feature: str, what: str) -> None:
+        """Fail early, and clearly, when IKEA's shared service for this feature does not serve the market."""
+
+        if not self.market.offers(feature):
+            raise NotAvailable(
+                f"{what} is not available for IKEA {self.market.name} through ikea-cli: IKEA runs it on a different system there.",
+                hint="Search, product details, stores and stock still work. Use ikea.com for this.",
+            )
+
     def format_price(self, value: Any, currency: str | None = None) -> str:
         """Write a price the way IKEA does in this market and language, e.g. '$1,299.00' or '1 299,00 €'."""
 
@@ -408,6 +417,7 @@ class IkeaClient:
     ) -> dict[str, Any]:
         """Home delivery and click & collect options for a postal code (no checkout involved)."""
 
+        self.require("delivery", "The delivery check")
         postal_code = postal_code or self.settings.postal_code
         if not postal_code:
             raise UsageError(
@@ -502,6 +512,7 @@ class IkeaClient:
         return out
 
     def _cart(self, method: str, path: str = "", **kwargs: Any) -> tuple[Any, bool]:
+        self.require("cart", "The shopping cart")
         headers = {"x-consumer-name": "Web Cart", "accept-language": self.lang, "accept": "*/*", "content-type": "application/json"}
         return self._authed(method, self._cart_base() + path, shopper=True, what="IKEA cart", headers=headers, **kwargs)
 
@@ -573,6 +584,7 @@ class IkeaClient:
     # ======================================================================= favourites
 
     def _favs(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
+        self.require("lists", "Favourites lists")
         base_vars = {"languageCode": self.lang, "storeId": self.settings.store, "zip": None}
         data, _ = self._authed(
             "POST",

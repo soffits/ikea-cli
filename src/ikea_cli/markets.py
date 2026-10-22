@@ -69,6 +69,9 @@ class Market:
     auth_domain: str | None = None
     auth_client_id: str | None = None
     keywords: tuple[str, ...] = ()
+    # Shared services checked as a guest when the table was made: "cart", "lists", "delivery".
+    # A missing entry means "not checked" and is treated as available.
+    features: dict[str, bool] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, country: str, data: dict[str, Any]) -> Market:
@@ -84,6 +87,7 @@ class Market:
             auth_domain=auth.get("domain"),
             auth_client_id=auth.get("client_id"),
             keywords=tuple(str(k) for k in data.get("keywords") or ()),
+            features={str(k): bool(v) for k, v in (data.get("features") or {}).items()},
         )
 
     @property
@@ -97,6 +101,9 @@ class Market:
         """Date of the last live check of the guest features, or None."""
 
         return TESTED.get(self.country)
+
+    def offers(self, feature: str) -> bool:
+        return self.features.get(feature, True)
 
     def price_format(self, language: str | None) -> PriceFormat:
         if language in self.price_formats:
@@ -115,6 +122,9 @@ class Market:
             "currency": self.currency,
             "login": bool(self.auth_domain and self.auth_client_id),
             "shop": self.has_shop,
+            "cart": self.offers("cart"),
+            "lists": self.offers("lists"),
+            "delivery": self.offers("delivery"),
             "tested": self.tested,
             "url": f"https://www.ikea.com/{self.country}/{self.default_language}/",
         }

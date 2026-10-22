@@ -36,6 +36,7 @@ TABLE = {
             "currency": "BBB",
             "price_format": {"en": {"prefix": "", "suffix": "", "decimals": 0, "group": ".", "decimal": ","}},
             "auth": None,
+            "features": {"cart": False, "lists": False, "delivery": True},
         },
     },
     "other_sites": {
@@ -289,3 +290,18 @@ def test_delivery_not_offered_in_market(router, make_client):
     )
     with pytest.raises(NotAvailable, match="delivery check is not available"):
         make_client().delivery([("12345678", 1)], postal_code="99999")
+
+
+def test_features_not_served_fail_early(table, router, isolated_env):
+    client = IkeaClient(Settings(country="bb"), paths=Paths.default(), http=httpx.Client(transport=httpx.MockTransport(router)))
+    with pytest.raises(NotAvailable, match="shopping cart is not available for IKEA Betaland"):
+        client.cart()
+    with pytest.raises(NotAvailable, match="Favourites lists"):
+        client.lists()
+    assert router.requests == []
+    assert markets.get("aa").offers("cart")  # not checked -> assumed available
+
+
+def test_markets_table_shows_missing_features(run, table):
+    code, out, _ = run("markets", "beta")
+    assert code == 0 and "login, cart, lists" in out

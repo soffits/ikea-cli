@@ -14,6 +14,7 @@ Sources, all public and the same ones the IKEA website loads in a browser:
 - https://www.ikea.com/{cc}/{lang}/profile/login/ and the profile app it loads: the market's
   public login settings (Auth0 domain and client id).
 - The interactive login link for our settings: kept only if Auth0 shows its login page.
+- Read-only guest requests to the shared cart, favourites and delivery services: which of them serve the market.
 - One product search per market and language: the currency and how IKEA writes prices there.
 
 pycountry (LGPL-2.1) is only used here, for English country names; the package does not need it.
@@ -139,6 +140,56 @@ def login_link_accepted(cc: str, lang: str, settings: dict[str, str]) -> bool:
     return resp.status_code == 200 and "error" not in resp.url.path and "error=" not in str(resp.url)
 
 
+GUEST_CLIENT_ID = "b477b9e4-b836-40fb-842f-43db89dd3c52"
+FAVOURITES_CLIENT_ID = "fe88ae57-2c34-4b14-8979-b915872886f7"
+CART_BFF_CLIENT_ID = "c3077c7d-d57c-4206-9a77-a55e01211b1b"
+
+
+def guest_features(cc: str, lang: str) -> dict[str, bool]:
+    """Which shared services accept this market, read-only and as a guest: cart, favourites, delivery check."""
+
+    resp = http.post(
+        "https://api.ingka.ikea.com/guest/token",
+        json={"retailUnit": cc},
+        headers={"x-client-id": GUEST_CLIENT_ID, "accept": "application/json;version=2"},
+    )
+    time.sleep(PAUSE)
+    token = resp.json().get("access_token") if resp.status_code == 200 else None
+    if not token:
+        return {"cart": False, "lists": False, "delivery": False}
+    auth = {"authorization": f"Bearer {token}"}
+    cart = http.get(
+        f"https://prod.cart.caas.selling.ingka.com/api/v1/{cc}",
+        params={"shoppingProfile": "ONLINE", "group": "DEFAULT"},
+        headers={**auth, "x-consumer-name": "Web Cart"},
+    )
+    time.sleep(PAUSE)
+    lists = http.post(
+        "https://favs.oneweb.ingka.com/graphql",
+        json={"query": "{lists{listId}}", "variables": {}},
+        headers={**auth, "x-client-id": FAVOURITES_CLIENT_ID},
+    )
+    time.sleep(PAUSE)
+    # An empty item list is rejected either way; only an unknown country is reported as "invalid_enum_value".
+    delivery = http.post(
+        "https://web-api.ikea.com/cart-bff-cf/api/v2/fulfilment",
+        json={
+            "address": {"postalCode": "", "stateCode": "", "storeId": "", "country": cc, "language": lang},
+            "items": [],
+            "planners": [],
+            "consumerName": "Web",
+            "flags": {"restock": False, "fetchFulfilmentPrices": False, "fetchPUPsAvailability": False},
+        },
+        headers={**auth, "x-client-id": CART_BFF_CLIENT_ID, "x-request-id": "00000000-0000-4000-8000-000000000000"},
+    )
+    time.sleep(PAUSE)
+    return {
+        "cart": cart.status_code == 200,
+        "lists": lists.status_code == 200 and "errors" not in lists.text[:20],
+        "delivery": not ("invalid_enum_value" in delivery.text and '"country"' in delivery.text),
+    }
+
+
 def _search(cc: str, lang: str, sort: str, text: str) -> list[dict[str, Any]]:
     body = {
         "searchParameters": {"input": text, "type": "QUERY"},
@@ -247,6 +298,7 @@ def build(only: set[str] | None) -> dict[str, Any]:
             "currency": currency,
             "price_format": formats,
             "auth": auth,
+            "features": guest_features(cc, default),
         }
     return {
         "generated": dt.date.today().isoformat(),

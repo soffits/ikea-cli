@@ -93,7 +93,13 @@ def test_stores_and_stock(guest):
     assert stock[0].get("error") is None
 
 
+def needs(client: IkeaClient, feature: str) -> None:
+    if not client.market.offers(feature):
+        pytest.skip(f"IKEA does not serve {feature} for this market through the shared services")
+
+
 def test_delivery(guest):
+    needs(guest, "delivery")
     store = sample_store(guest)
     postal = os.environ.get("IKEA_LIVE_POSTAL_CODE") or store.get("postal_code")
     if not postal:
@@ -103,6 +109,7 @@ def test_delivery(guest):
 
 
 def test_guest_cart_cycle(guest):
+    needs(guest, "cart")
     item = sample_item(guest)
     guest.cart_clear()
     cart = guest.cart_add([(item, 2)])
@@ -114,6 +121,7 @@ def test_guest_cart_cycle(guest):
 
 
 def test_guest_list_cycle(guest):
+    needs(guest, "lists")
     item = sample_item(guest)
     created = guest.list_create("ikea-cli live test")
     try:

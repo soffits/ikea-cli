@@ -73,6 +73,10 @@ url="$(q search LACK -n 1 | pick "d['items'][0]['url']")"
 store="${IKEA_SMOKE_STORE:-$(q stores | pick "next((s['id'] for s in d if 'STORE' in str(s.get('kind') or '').upper() and s.get('postal_code')), d[0]['id'])")}"
 postal="${IKEA_SMOKE_POSTAL_CODE:-$(q stores | pick "next((s.get('postal_code') or '' for s in d if s['id']=='$store'), '')")}"
 category="$(q categories | pick "d[0]['id']")"
+feature() { uv run --quiet python -c "from ikea_cli import markets; m=markets.get('$country'); print('yes' if m.offers('$1') else 'no')"; }
+has_cart="$(feature cart)"; has_lists="$(feature lists)"; has_delivery="$(feature delivery)"
+skip() { na=$((na + 1)); printf 'n/a   %-45s not offered in this market\n' "$*"; }
+echo "cart: $has_cart  lists: $has_lists  delivery: $has_delivery"
 echo "items: $A $B  store: $store  postal code: ${postal:-(none)}  category: $category"
 
 run 0 stores
@@ -90,31 +94,43 @@ run 0 product "$A"
 run 4 product 00000001
 run 0 stock "$A" "$B"
 run 0 stock "$A" --all
-if [ -n "$postal" ]; then
+if [ "$has_delivery" = no ]; then
+  run 5 delivery "$A:2" --postal-code 00000   # says it is not available here
+elif [ -n "$postal" ]; then
   run_or_na delivery "$A:2" "$B"
 else
   run 2 delivery "$A:2"                    # explains that a postal code is needed
 fi
 run 0 auth status
-run 0 cart show
-run 0 cart add "$A:2" "$B"
-run 0 cart set "$A:3"
-if [ "$A" != "$B" ]; then
-  run 0 cart remove "$B"
-  run 4 cart remove "$B"
+if [ "$has_cart" = yes ]; then
+  run 0 cart show
+  run 0 cart add "$A:2" "$B"
+  run 0 cart set "$A:3"
+  if [ "$A" != "$B" ]; then
+    run 0 cart remove "$B"
+    run 4 cart remove "$B"
+  fi
+  run 5 cart coupon add NOT-A-REAL-CODE
+  [ -n "$postal" ] && run_or_na delivery
+  run 0 cart clear --yes
+else
+  run 5 cart show                         # says it is not available here
+  skip cart add/set/remove/coupon/clear
 fi
-run 5 cart coupon add NOT-A-REAL-CODE
-[ -n "$postal" ] && run_or_na delivery
-run 0 cart clear --yes
-run 0 lists
-run 0 lists create "smoke test"
-run 0 lists add "$A:2" --list "smoke test"
-run 0 lists set "$A:1" --list "smoke test"
-run 0 lists show "smoke test"
-run 0 lists rename "smoke test" "smoke test 2"
-run 0 lists select "smoke test 2"
-run 0 lists remove "$A" --list "smoke test 2"
-run 0 lists delete "smoke test 2" --yes
+if [ "$has_lists" = yes ]; then
+  run 0 lists
+  run 0 lists create "smoke test"
+  run 0 lists add "$A:2" --list "smoke test"
+  run 0 lists set "$A:1" --list "smoke test"
+  run 0 lists show "smoke test"
+  run 0 lists rename "smoke test" "smoke test 2"
+  run 0 lists select "smoke test 2"
+  run 0 lists remove "$A" --list "smoke test 2"
+  run 0 lists delete "smoke test 2" --yes
+else
+  run 5 lists                             # says it is not available here
+  skip lists create/add/set/show/rename/select/remove/delete
+fi
 run 3 orders
 if [ "$(uv run --quiet python -c "from ikea_cli import markets; print(bool(markets.get('$country').auth_domain))")" = "True" ]; then
   run 0 auth login --start
@@ -122,7 +138,7 @@ else
   run 7 auth login --start                 # login not offered for this market
 fi
 run 0 auth logout --local-only
-run 0 cart show
+[ "$has_cart" = yes ] && run 0 cart show
 
 if [ -n "$account_token" ]; then
   export IKEA_ACCESS_TOKEN="$account_token"

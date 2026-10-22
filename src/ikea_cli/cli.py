@@ -570,6 +570,15 @@ def _offers(country: str, language: str | None) -> bool:
     return bool(market and language and language in market.languages)
 
 
+def _features(m: markets.Market) -> list[tuple[str, bool]]:
+    return [
+        ("login", bool(m.auth_domain)),
+        ("cart", m.offers("cart")),
+        ("lists", m.offers("lists")),
+        ("delivery", m.offers("delivery")),
+    ]
+
+
 def h_markets(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
     matches = markets.search(args.query)
     found = [m for m in matches if m.has_shop]
@@ -580,11 +589,12 @@ def h_markets(args: argparse.Namespace, ctx: Context) -> tuple[Any, str | None]:
             m.name,
             ", ".join(m.languages),
             m.currency,
+            ", ".join(f for f, ok in _features(m) if not ok) or "-",
             m.tested or "-",
         ]
         for m in found
     ]
-    text = table(rows, ["Code", "Country", "Languages", "Currency", "Tested"]) if rows else "No market matches."
+    text = table(rows, ["Code", "Country", "Languages", "Currency", "Not available", "Tested"]) if rows else "No market matches."
     if args.all:
         q = (args.query or "").lower()
         others = [
