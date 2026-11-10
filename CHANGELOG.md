@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `ikea product` no longer shows another product's details (name, price, dimensions) when IKEA's product page also embeds data for a related item. The page block is now matched by item number; if no block matches, only the summary is returned (`details_available: false`).
+
 ## 0.2.0 (2026-10-22)
 
 Works in every IKEA country that shares the www.ikea.com platform, not only Canada.
