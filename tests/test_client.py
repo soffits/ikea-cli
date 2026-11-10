@@ -164,6 +164,28 @@ def test_product_from_url_and_not_found(router, make_client):
     assert router.requests[0].url.path.endswith("/s12345678.json")
 
 
+def test_product_page_with_several_products_picks_the_requested_one(router, make_client):
+    # Product pages can embed data for other products before the page's own one.
+    router.add("GET", "https://www.ikea.com/ca/en/products/678/12345678.json", load_fixture("product_summary.json"))
+    router.add("GET", "https://www.ikea.com/ca/en/p/testbord-side-table-white-12345678/", load_fixture("product_page_multi.html"))
+    p = make_client().product("123.456.78")
+    assert p["details_available"] is True
+    assert p["name"] == "TESTBORD"
+    assert p["formatted_item_no"] == "123.456.78"
+    assert p["price"] == 29.99
+    assert p["dimensions"] == [{"name": "Width", "value": "55 cm"}]
+
+
+def test_product_page_without_the_requested_product_returns_summary(router, make_client):
+    page = load_fixture("product_page_multi.html").replace('"12345678"', '"11111111"').replace("123.456.78", "111.111.11")
+    router.add("GET", "https://www.ikea.com/ca/en/products/678/12345678.json", load_fixture("product_summary.json"))
+    router.add("GET", "https://www.ikea.com/ca/en/p/testbord-side-table-white-12345678/", page)
+    p = make_client().product("12345678")
+    assert p["details_available"] is False
+    assert p["name"] == "TESTBORD"
+    assert p["price"] == 29.99
+
+
 def test_product_page_without_data_returns_summary(router, make_client):
     router.add("GET", "https://www.ikea.com/ca/en/products/678/12345678.json", load_fixture("product_summary.json"))
     router.add("GET", "https://www.ikea.com/ca/en/p/testbord-side-table-white-12345678/", "<html>changed</html>")

@@ -308,7 +308,7 @@ class IkeaClient:
         if resp.status_code != 200:
             summary["details_available"] = False
             return summary
-        page = extract_page_props(resp.text)
+        page = extract_page_props(resp.text, summary["item_no"])
         if not page:
             summary["details_available"] = False
             return summary
@@ -889,20 +889,41 @@ def _graphql_data(data: Any, what: str) -> dict[str, Any]:
     return data.get("data") or {}
 
 
-def extract_page_props(page_html: str) -> dict[str, Any] | None:
-    """Find the product page's main data block among the page's embedded JSON scripts."""
+def extract_page_props(page_html: str, item_no: str | None = None) -> dict[str, Any] | None:
+    """Find the product page's data block for `item_no` among the page's embedded JSON scripts.
 
+    A product page can embed data for several products: one hydrate script may hold
+    entries "0", "1", ... each with its own `pageProps.product`, and the first one is
+    not always the page's own product (it can be a related item). With `item_no`, only
+    a block whose product has that item number is returned; without it, the first block.
+    """
+
+    want = _digits(item_no) if item_no else None
     for m in _HYDRATE_RE.finditer(page_html):
-        if '"pageProps"' not in m.group(1)[:200]:
+        if '"pageProps"' not in m.group(1):
             continue
         try:
             data = json.loads(m.group(1))
         except ValueError:
             continue
-        props = data.get("0", {}).get("loaderData", {}).get("pageProps")
-        if isinstance(props, dict) and isinstance(props.get("product"), dict):
-            return props
+        if not isinstance(data, dict):
+            continue
+        for entry in data.values():
+            loader = entry.get("loaderData") if isinstance(entry, dict) else None
+            props = loader.get("pageProps") if isinstance(loader, dict) else None
+            if not isinstance(props, dict) or not isinstance(props.get("product"), dict):
+                continue
+            if want is None:
+                return props
+            product = props["product"]
+            ids = {_digits(product.get(k)) for k in ("itemNo", "prefixedProductId", "visibleItemNo")}
+            if want in ids:
+                return props
     return None
+
+
+def _digits(value: Any) -> str:
+    return re.sub(r"\D", "", value) if isinstance(value, str) else ""
 
 
 def parse_categories(page_html: str) -> list[dict[str, Any]]:
