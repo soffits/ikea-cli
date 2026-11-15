@@ -7,7 +7,7 @@ name = "ikea-cli"
 dynamic = ["version"]
 description = "Unofficial command-line client and Python library for the IKEA website: search, stock, cart, favourites, orders"
 readme = "README.md"
-license = "AGPL-3.0-only"
+license = "AGPL-3.0-or-later"
 authors = [{ name = "Sakina" }]
 maintainers = [{ name = "Sakina" }]
 requires-python = ">=3.11"
@@ -18,7 +18,7 @@ classifiers = [
     "Environment :: Console",
     "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",

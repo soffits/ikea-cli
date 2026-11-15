@@ -24,4 +24,4 @@ This repository builds `ikea-cli`, an unofficial command-line client and Python 
 - Keep one code path for all markets; market differences come from `markets.json` or IKEA's responses, not per-country branches. Examples and fixtures use placeholders (`<store-id>`, `<postal-code>`) or made-up places, never real localities.
 - Do not add checkout, payment, order placement, order cancellation or point redemption.
 - Prefer the standard library. Current runtime dependencies are `httpx` and `platformdirs`; add one only when clearly necessary.
-- Repository text is English. Commit messages use Conventional Commits. License: AGPL-3.0-only.
+- Repository text is English. Commit messages use Conventional Commits. License: AGPL-3.0-or-later.
