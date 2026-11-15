@@ -25,3 +25,4 @@ This repository builds `ikea-cli`, an unofficial command-line client and Python 
 - Do not add checkout, payment, order placement, order cancellation or point redemption.
 - Prefer the standard library. Current runtime dependencies are `httpx` and `platformdirs`; add one only when clearly necessary.
 - Repository text is English. Commit messages use Conventional Commits. License: AGPL-3.0-or-later.
+- PR titles are Conventional Commit subjects (`feat: ...`, `fix(scope): ...`), because a squash merge makes the title the commit on the default branch; CI checks it.
