@@ -373,4 +373,4 @@ Earlier community projects showed what was possible and helped confirm how IKEA'
 
 ## License
 
-Copyright © 2026 Sakina. Licensed under the [GNU Affero General Public License v3.0 only](LICENSE).
+Copyright © 2026 Sakina. Licensed under the [GNU Affero General Public License v3.0 or later](LICENSE).
